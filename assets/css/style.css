@@ -614,7 +614,8 @@ a{color:inherit;text-decoration:none}
 /* ---------- fixed contact pill ---------- */
 .pill{
   position:fixed;right:16px;bottom:16px;z-index:130;
-  display:inline-flex;align-items:center;gap:10px;
+  display:inline-flex;align-items:center;gap:10px;cursor:pointer;
+  font-family:inherit;
   padding:11px 18px;border-radius:99px;
   background:rgba(14,14,14,.9);border:1px solid var(--line-2);
   backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -631,8 +632,10 @@ a{color:inherit;text-decoration:none}
 .pill:hover,.pill:focus-visible{background:#fff;color:#000;border-color:#fff;transform:translateY(-2px);gap:10px}
 .pill:hover > span:last-child,.pill:focus-visible > span:last-child{max-width:260px;opacity:1}
 .pill__eq{display:flex;align-items:flex-end;gap:2px;height:12px}
-.pill__eq i{display:block;width:2px;background:var(--accent);animation:eq 1s ease-in-out infinite}
-.pill:hover .pill__eq i{background:#000}
+/* the bars only move while something is actually playing */
+.pill__eq i{display:block;width:2px;background:var(--accent);transform:scaleY(.35);transform-origin:50% 100%;transition:transform .3s var(--ease)}
+.pill.is-playing .pill__eq i{animation:eq 1s ease-in-out infinite}
+.pill:hover .pill__eq i,.pill:focus-visible .pill__eq i{background:#000}
 .pill__eq i:nth-child(1){height:6px;animation-delay:0s}
 .pill__eq i:nth-child(2){height:12px;animation-delay:.18s}
 .pill__eq i:nth-child(3){height:8px;animation-delay:.36s}
@@ -687,7 +690,7 @@ a{color:inherit;text-decoration:none}
   .orb > i{animation:none}
   .marquee__track{animation:none}
   .lit .lw{opacity:1}
-  .pill__eq i{animation:none}
+  .pill.is-playing .pill__eq i{animation:none}
   [data-hero]{opacity:1;transform:none;filter:none;animation:none}
   .hero__shell{transform:none;opacity:1}
   [data-reveal]{opacity:0;transform:none;filter:none;transition:opacity .25s linear}

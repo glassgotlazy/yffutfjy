@@ -1045,6 +1045,114 @@ void main(){
     if (row) track.appendChild(row.cloneNode(true));
   }
 
+  /* ───────────── 17. ambient sound ─────────────
+     Browsers refuse to start audio without a user gesture, which is why
+     sites like this usually put up a click-to-enter wall. Instead the
+     first real interaction (pointer, key, wheel, touch) is used as that
+     gesture, so nothing blocks the content. The choice is remembered, the
+     volume is ramped rather than switched, and if no audio file is present
+     the control hides itself instead of sitting there doing nothing. */
+  const sound = (() => {
+    const el   = $('#track');
+    const pill = $('#sound');
+    const KEY  = 'at-sound';
+
+    const VOLUME      = 0.32;    // ceiling — never full blast
+    const START_MUTED = false;   // true = silent until the visitor asks
+    const FADE_MS     = 900;
+
+    let ready = false, playing = false, raf = 0;
+
+    function label() {
+      if (!pill) return;
+      const l = $('.pill__label', pill);
+      if (l) l.textContent = playing ? 'Sound on' : 'Sound off';
+      pill.setAttribute('aria-pressed', String(playing));
+      pill.setAttribute('aria-label', playing ? 'Mute ambient sound' : 'Play ambient sound');
+      pill.classList.toggle('is-playing', playing);
+    }
+
+    function ramp(to, done) {
+      if (raf) cancelAnimationFrame(raf);
+      const from = el.volume, t0 = performance.now();
+      const step = (now) => {
+        const p = clamp((now - t0) / FADE_MS, 0, 1);
+        el.volume = clamp(from + (to - from) * p, 0, 1);
+        if (p < 1) { raf = requestAnimationFrame(step); return; }
+        raf = 0;
+        done?.();
+      };
+      raf = requestAnimationFrame(step);
+    }
+
+    async function start() {
+      if (!ready) return false;
+      try {
+        el.volume = 0;
+        await el.play();
+        playing = true;
+        ramp(VOLUME);
+        label();
+        return true;
+      } catch {
+        // autoplay refused, or no decodable source — stay silent and
+        // leave the control for the visitor to press themselves
+        playing = false;
+        label();
+        return false;
+      }
+    }
+
+    function stop() {
+      if (!ready) return;
+      ramp(0, () => el.pause());
+      playing = false;
+      label();
+    }
+
+    function remember(v) { try { localStorage.setItem(KEY, v); } catch { /* private mode */ } }
+    function recall()    { try { return localStorage.getItem(KEY); } catch { return null; } }
+
+    return {
+      init() {
+        if (!el || !pill) return;
+
+        // no playable source => no control
+        el.addEventListener('error', () => { pill.hidden = true; ready = false; }, true);
+        el.addEventListener('canplay', () => {
+          ready = true;
+          pill.hidden = false;
+          label();
+        });
+
+        el.load();
+
+        pill.addEventListener('click', () => {
+          playing ? stop() : start();
+          remember(playing ? 'on' : 'off');
+        });
+
+        // the visitor's first interaction doubles as the gesture the
+        // autoplay policy requires — no enter-gate needed
+        const wanted = recall() ?? (START_MUTED ? 'off' : 'on');
+        if (wanted === 'on') {
+          const kick = () => {
+            if (!playing) start();
+            ['pointerdown', 'keydown', 'wheel', 'touchstart']
+              .forEach(t => window.removeEventListener(t, kick));
+          };
+          ['pointerdown', 'keydown', 'wheel', 'touchstart']
+            .forEach(t => window.addEventListener(t, kick, { passive: true }));
+        }
+
+        document.addEventListener('visibilitychange', () => {
+          if (!ready || !playing) return;
+          document.hidden ? el.pause() : el.play().catch(() => {});
+        });
+      }
+    };
+  })();
+
   /* ───────────── boot ───────────── */
   function boot() {
     splitText();
@@ -1054,6 +1162,7 @@ void main(){
     initPill();
     initDrawer();
     initCopy();
+    sound.init();
     initDecode();
     initMarquee();
     initAnchors();

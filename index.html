@@ -544,10 +544,19 @@
 
 </main>
 
-<a class="pill" href="#contact">
+<!-- TODO: drop your track at assets/audio/ambient.(mp3|ogg|wav).
+     Until a file is present the player hides itself rather than showing a
+     control that cannot do anything. -->
+<audio id="track" loop preload="none" playsinline>
+  <source src="assets/audio/ambient.mp3" type="audio/mpeg">
+  <source src="assets/audio/ambient.ogg" type="audio/ogg">
+  <source src="assets/audio/ambient.wav" type="audio/wav">
+</audio>
+
+<button class="pill" id="sound" type="button" aria-pressed="false" hidden>
   <span class="pill__eq" aria-hidden="true"><i></i><i></i><i></i></span>
-  <span>Open to research collaboration</span>
-</a>
+  <span class="pill__label">Sound off</span>
+</button>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

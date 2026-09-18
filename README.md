@@ -138,14 +138,15 @@ text deliberately low-contrast against the background, tiny caps labels with a s
 (`●RESEARCH 02`), asymmetric editorial blocks, a credentials stack hung top-right, and no
 rounded corners anywhere.
 
-What was not taken, and why:
+Ambient audio is included, at the author's request, as the corner player — see
+`assets/audio/README.md` for where to put the track and how to change the two settings.
+There is deliberately **no click-to-enter gate**: browsers refuse to start audio without a
+user gesture, and rather than putting up a splash screen whose only job is to harvest one
+click, the visitor's first real interaction is used as that gesture. Volume is capped, the
+ramp is faded, the choice persists, and with no audio file present the control hides itself.
 
-- **A click-to-enter gate and background audio.** The reference is a music release, where
-  sound is the product and the gate exists only because browsers block autoplay without a
-  gesture. Here it would cost every visitor a click and a wall of sound before they see
-  anything — the wrong trade for a page a recruiter opens in an office.
-- **Full-bleed photography.** Much of the reference's weight comes from imagery. There is
-  none here yet; see the TODOs.
+What was not taken: **full-bleed photography.** Much of the reference's weight comes from
+imagery. There is none here yet; see the TODOs.
 
 One deliberate deviation: the reference is strictly monochrome, but the brief called for a
 single sharp accent. The lime is kept and demoted to the bullet dots, the active rail mark,
