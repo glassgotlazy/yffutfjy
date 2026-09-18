@@ -128,6 +128,19 @@ these are fabricated — fill them in as they exist:
 - Repo link and live demo URL for the Amity Admissions Assistant
 - `og:url` and `og:image` in `<head>`, once the site is deployed
 
+## Accessibility
+
+Text colour is audited against WCAG AA rather than eyeballed — `a11y.js` in the
+verification scripts measures every text node's computed colour against the page
+background. Everything carrying information passes AA: `--body` at 5.9:1, `--muted` at
+5.1:1. `--dim` sits at 3.8:1 and is reserved for decorative marks that repeat information
+available elsewhere — the rotated edge label and the "scroll" cue. Moving anything
+informational onto `--dim` would regress this.
+
+The scroll-lit paragraph deliberately starts near-invisible and fills as it is read. Under
+`prefers-reduced-motion` it renders at full opacity immediately, so nobody depending on
+that setting ever sees low-contrast text.
+
 ## Known inconsistency to resolve
 
 The résumé in `assets/docs/` describes the Offline PDF Toolkit as **Python, Streamlit,
