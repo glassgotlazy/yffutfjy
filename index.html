@@ -18,7 +18,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
@@ -112,36 +112,44 @@
 <section class="hero" id="hero" data-section="hero">
   <div class="hero__grid" aria-hidden="true" data-parallax data-speed="-0.07"></div>
 
+  <span class="edge edge--l" aria-hidden="true">AI SECURITY RESEARCH</span>
+  <span class="edge edge--r" aria-hidden="true">LUCKNOW, INDIA</span>
+
   <div class="shell hero__shell" id="hero-shell">
-    <p class="hero__eyebrow" data-hero="1">
-      <span class="dot" aria-hidden="true"></span>
-      B.Tech CSE · Amity School of Engineering &amp; Technology · 2025&ndash;2029
-    </p>
+    <div class="hero__grid-l">
+      <h1 class="hero__title" data-hero="2">
+        <span class="split" data-split="chars">Anuansh Tiwari</span>
+      </h1>
 
-    <h1 class="hero__title" data-hero="2">
-      <span class="split" data-split="chars">Anuansh Tiwari</span>
-    </h1>
+      <p class="hero__lede" data-hero="3">
+        I research how generative AI breaks &mdash; <em>and build tools that don&rsquo;t.</em>
+      </p>
 
-    <p class="hero__lede" data-hero="3">
-      I research how generative AI breaks &mdash; <em>and build tools that don&rsquo;t.</em>
-    </p>
-
-    <ul class="hero__facts" data-hero="4">
-      <li>Amity University Uttar Pradesh, Lucknow</li>
-      <li>CGPA 7.48&thinsp;/&thinsp;10</li>
-      <li>IEEE Student Member</li>
-      <li>Lucknow, India</li>
-    </ul>
-
-    <div class="hero__links" data-hero="5">
-      <a class="btn btn--primary magnetic" href="mailto:anuanshtiwari191@gmail.com">
-        <span>anuanshtiwari191@gmail.com</span>
-      </a>
-      <a class="btn magnetic" href="https://github.com/glassgotlazy" target="_blank" rel="noopener">GitHub</a>
-      <a class="btn magnetic" href="https://linkedin.com/in/anuansh" target="_blank" rel="noopener">LinkedIn</a>
-      <a class="btn magnetic" href="https://orcid.org/0009-0007-4226-7925" target="_blank" rel="noopener">ORCID&nbsp;<span class="btn__mono">0009-0007-4226-7925</span></a>
-      <a class="btn magnetic" href="tel:+919871503105">+91&nbsp;98715&nbsp;03105</a>
+      <div class="hero__links" data-hero="5">
+        <a class="btn btn--primary magnetic" href="mailto:anuanshtiwari191@gmail.com">
+          <span>anuanshtiwari191@gmail.com</span>
+        </a>
+        <a class="btn magnetic" href="https://github.com/glassgotlazy" target="_blank" rel="noopener">GitHub</a>
+        <a class="btn magnetic" href="https://linkedin.com/in/anuansh" target="_blank" rel="noopener">LinkedIn</a>
+        <a class="btn magnetic" href="https://orcid.org/0009-0007-4226-7925" target="_blank" rel="noopener">ORCID</a>
+        <a class="btn magnetic" href="tel:+919871503105">+91&nbsp;98715&nbsp;03105</a>
+      </div>
     </div>
+
+    <aside class="meta" data-hero="1">
+      <p class="meta__block">
+        B.Tech CSE<br>
+        Amity School of Engineering &amp; Technology<br>
+        Amity University Uttar Pradesh, Lucknow<br>
+        2025&ndash;2029 &middot; CGPA 7.48/10
+      </p>
+      <p class="meta__block">
+        IEEE Student Member<br>
+        ORCID 0009-0007-4226-7925<br>
+        Lucknow, India<br>
+        &copy;2026
+      </p>
+    </aside>
   </div>
 
   <div class="hero__cue" data-hero="6" aria-hidden="true">
@@ -154,7 +162,7 @@
 <section class="section" id="about" data-section="about">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left">01</span>
+      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>ABOUT<b>01</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Measurement first</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Claims are cheap. I build the corpus, run the experiment, and publish the numbers.</p>
@@ -221,15 +229,15 @@
 <section class="section" id="research" data-section="research">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left">02</span>
+      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>RESEARCH<b>02</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Research &amp; publications</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Surveys, reviews and measurements on how generative systems fail.</p>
     </header>
 
-    <div class="papers" data-reveal-group>
+    <ol class="papers" data-reveal-group>
 
-      <article class="paper glow" data-reveal data-tilt>
+      <li class="paper glow" data-reveal data-tilt>
         <div class="paper__top">
           <span class="paper__idx">P&thinsp;01</span>
           <span class="tag tag--live"><span class="tag__dot"></span>Presented</span>
@@ -245,9 +253,9 @@
           <li>LLM abuse</li><li>Phishing</li><li>Malware generation</li><li>Safety filters</li><li>n=880 corpus</li>
         </ul>
         <p class="todo">TODO: add DOI / proceedings link once indexed</p>
-      </article>
+      </li>
 
-      <article class="paper glow" data-reveal data-tilt>
+      <li class="paper glow" data-reveal data-tilt>
         <div class="paper__top">
           <span class="paper__idx">P&thinsp;02</span>
           <span class="tag">IEEE review · four authors</span>
@@ -262,9 +270,9 @@
           <li>Agentic AI</li><li>Threat modelling</li><li>NVD / CVE</li><li>Reliability</li>
         </ul>
         <p class="todo">TODO: add DOI / preprint link</p>
-      </article>
+      </li>
 
-      <article class="paper glow" data-reveal data-tilt>
+      <li class="paper glow" data-reveal data-tilt>
         <div class="paper__top">
           <span class="paper__idx">P&thinsp;03</span>
           <span class="tag">Conference talk · 8 min</span>
@@ -280,9 +288,9 @@
           <li>PRISMA-informed</li><li>75 sources</li><li>51 coded studies</li><li>Hiring algorithms</li><li>Springer</li>
         </ul>
         <p class="todo">TODO: add DOI / proceedings link</p>
-      </article>
+      </li>
 
-      <article class="paper glow" data-reveal data-tilt>
+      <li class="paper glow" data-reveal data-tilt>
         <div class="paper__top">
           <span class="paper__idx">P&thinsp;04</span>
           <span class="tag tag--wip"><span class="tag__dot"></span>In progress</span>
@@ -296,9 +304,9 @@
           <li>Post-quantum</li><li>ML-KEM</li><li>TLS 1.3</li><li>Benchmarking</li>
         </ul>
         <p class="todo">TODO: add results / preprint link when the work lands</p>
-      </article>
+      </li>
 
-    </div>
+    </ol>
   </div>
 </section>
 
@@ -315,7 +323,7 @@
 <section class="section" id="projects" data-section="projects">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left">03</span>
+      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>PROJECTS<b>03</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Projects</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Offline-first tools where privacy is architectural, not a promise.</p>
@@ -376,7 +384,7 @@
 <section class="section" id="experience" data-section="experience">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left">04</span>
+      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>EXPERIENCE<b>04</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Experience</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Telecom security, research and field programmes.</p>
@@ -423,7 +431,7 @@
 <section class="section" id="skills" data-section="skills">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left">05</span>
+      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>SKILLS<b>05</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Skills</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Languages, data tooling, model APIs and the security work they serve.</p>
@@ -468,7 +476,7 @@
 <section class="section" id="leadership" data-section="leadership">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left">06</span>
+      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>LEADERSHIP<b>06</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Leadership</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Professional community and chapter building.</p>
@@ -491,7 +499,7 @@
 <section class="section section--contact" id="contact" data-section="contact">
   <div class="shell">
     <div class="cta" data-reveal-group>
-      <p class="cta__eyebrow" data-reveal>07 &mdash; Contact</p>
+      <p class="cta__eyebrow" data-reveal><i class="bul"></i>CONTACT<b>07</b></p>
       <h2 class="cta__title" data-reveal="title">
         <span class="split" data-split="chars">Let&rsquo;s compare notes.</span>
       </h2>
@@ -535,6 +543,11 @@
 </section>
 
 </main>
+
+<a class="pill" href="#contact">
+  <span class="pill__eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  <span>Open to research collaboration</span>
+</a>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 

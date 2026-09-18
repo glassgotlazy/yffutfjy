@@ -129,8 +129,30 @@ these are fabricated — fill them in as they exist:
 - CV / résumé PDF link in the contact section
 - `og:url` and `og:image` in `<head>`, once the site is deployed
 
+## Visual language
+
+Near-monochrome, square-edged, display-scale grotesque on pure black with heavy film
+grain — adapted from a reference the author supplied. What was taken: the black-and-grain
+ground, the strict greyscale, body copy set at headline sizes with tight leading, grey
+text deliberately low-contrast against the background, tiny caps labels with a signal dot
+(`●RESEARCH 02`), asymmetric editorial blocks, a credentials stack hung top-right, and no
+rounded corners anywhere.
+
+What was not taken, and why:
+
+- **A click-to-enter gate and background audio.** The reference is a music release, where
+  sound is the product and the gate exists only because browsers block autoplay without a
+  gesture. Here it would cost every visitor a click and a wall of sound before they see
+  anything — the wrong trade for a page a recruiter opens in an office.
+- **Full-bleed photography.** Much of the reference's weight comes from imagery. There is
+  none here yet; see the TODOs.
+
+One deliberate deviation: the reference is strictly monochrome, but the brief called for a
+single sharp accent. The lime is kept and demoted to the bullet dots, the active rail mark,
+the counters and the tagline. To drop it entirely, set `--accent` to `#ffffff`.
+
 ## Fonts
 
-Space Grotesk, Inter and JetBrains Mono load from Google Fonts, with system fallbacks in
-the stack. To self-host, drop the `<link>` in `index.html` and point `--font-display`,
-`--font-body` and `--font-mono` at local `@font-face` rules.
+Inter Tight and JetBrains Mono load from Google Fonts, with system fallbacks in the stack.
+To self-host, drop the `<link>` in `index.html` and point `--font` and `--font-mono` at
+local `@font-face` rules.

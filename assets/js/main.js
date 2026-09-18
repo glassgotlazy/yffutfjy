@@ -384,7 +384,7 @@
       let p;
       if (r.bottom < 0) p = 1;
       else if (r.top > vh) p = 0;
-      else p = clamp((vh * 0.8 - r.top) / (vh * 0.55 + r.height * 0.5), 0, 1);
+      else p = clamp((vh * 0.88 - r.top) / (vh * 0.6 + r.height * 0.5), 0, 1);
       el.style.setProperty('--lit', (p * n).toFixed(2));
     }
   }
@@ -574,7 +574,7 @@
 
       // hue travels with scroll: lime at the top → cyan/violet at the bottom,
       // and the field speeds up slightly with scroll velocity
-      hue = 78 + progress * 190;
+      hue = 70 + progress * 170;
       const link = mqCoarse.matches ? 108 : 138;
       const drift = 1 + progress * 0.6 + Math.min(vel / 45, 1.4);
 
@@ -607,7 +607,7 @@
           if (d2 > link * link) continue;
           const alpha = (1 - Math.sqrt(d2) / link) * 0.2;
           if (alpha < 0.012) continue;      // invisible, not worth a path
-          ctx.strokeStyle = `hsla(${hue}, 80%, 62%, ${alpha.toFixed(3)})`;
+          ctx.strokeStyle = `hsla(${hue}, 12%, 82%, ${alpha.toFixed(3)})`;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
@@ -616,7 +616,7 @@
       }
 
       for (const n of nodes) {
-        ctx.fillStyle = `hsla(${hue}, 85%, 66%, .4)`;
+        ctx.fillStyle = `hsla(${hue}, 14%, 86%, .34)`;
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
         ctx.fill();
@@ -724,15 +724,13 @@ void main(){
   float d = distance(q, vec2(uM.x * ar, uM.y));
   n += smoothstep(0.40, 0.0, d) * 0.11;
 
-  // palette travels with scroll: lime -> cyan -> violet, matching --sp
-  vec3 lime   = vec3(0.776, 0.949, 0.306);
-  vec3 cyan   = vec3(0.235, 0.718, 1.000);
-  vec3 violet = vec3(0.620, 0.440, 1.000);
-  vec3 a = mix(lime, cyan,   smoothstep(0.00, 0.55, uP));
-  vec3 b = mix(cyan, violet, smoothstep(0.45, 1.00, uP));
-  vec3 col = mix(a, b, smoothstep(0.25, 0.85, n));
+  // near-monochrome: the page is greyscale, so the backdrop only carries a
+  // breath of tint that travels with scroll rather than a colour ramp
+  vec3 warm = vec3(0.95, 0.97, 0.90);
+  vec3 cool = vec3(0.88, 0.91, 1.00);
+  vec3 col  = mix(warm, cool, smoothstep(0.0, 1.0, uP));
 
-  float amt = pow(smoothstep(0.30, 0.95, n), 2.0) * (0.42 + uV * 0.10);
+  float amt = pow(smoothstep(0.34, 0.95, n), 2.2) * (0.16 + uV * 0.04);
 
   // hold the centre back so body copy keeps its contrast
   amt *= smoothstep(0.06, 0.78, length(uv - 0.5) * 1.35);
@@ -740,7 +738,7 @@ void main(){
   // ordered dither: without this, a dark ramp bands visibly on 8-bit panels
   float dither = (hash(gl_FragCoord.xy + fract(uT)) - 0.5) / 255.0;
 
-  o = vec4(col, clamp(amt, 0.0, 0.52) + dither);
+  o = vec4(col, clamp(amt, 0.0, 0.20) + dither);
 }`;
 
     function compile(type, src){
