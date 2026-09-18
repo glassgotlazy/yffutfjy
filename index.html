@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Anuansh Tiwari — AI Security Research</title>
+<meta name="description" content="Anuansh Tiwari — B.Tech CSE student at Amity University Uttar Pradesh, Lucknow. Research on LLM-enabled cyberattacks, agentic-AI security, deepfake trust collapse, AI resume screening and post-quantum cryptography.">
+<meta name="author" content="Anuansh Tiwari">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#07080a">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Anuansh Tiwari — AI Security Research">
+<meta property="og:description" content="I research how generative AI breaks — and build tools that don't.">
+<!-- TODO: add og:url and og:image once the site is deployed and a social card exists -->
+
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%2307080a'/><path d='M8 23 16 9l8 14' stroke='%23c6f24e' stroke-width='2.4' fill='none' stroke-linejoin='round'/></svg>">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+
+<body>
+<a class="skip-link" href="#about">Skip to content</a>
+
+<!-- ambient layers -->
+<div class="field" aria-hidden="true">
+  <canvas id="field-canvas"></canvas>
+</div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- scroll progress -->
+<div class="progress" aria-hidden="true"><span class="progress__bar" id="progress-bar"></span></div>
+
+<!-- nav -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a class="nav__brand" href="#top">
+      <span class="nav__mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" width="22" height="22"><path d="M8 23 16 9l8 14" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="nav__name">Anuansh&nbsp;Tiwari</span>
+      <span class="nav__role">AI security research</span>
+    </a>
+
+    <nav class="nav__links" aria-label="Section navigation">
+      <a href="#about" data-nav="about">About</a>
+      <a href="#research" data-nav="research">Research</a>
+      <a href="#projects" data-nav="projects">Projects</a>
+      <a href="#experience" data-nav="experience">Experience</a>
+      <a href="#skills" data-nav="skills">Skills</a>
+      <a href="#contact" data-nav="contact">Contact</a>
+    </nav>
+
+    <div class="nav__meta">
+      <span class="nav__pct" id="nav-pct" aria-hidden="true">00</span>
+      <button class="nav__toggle" id="nav-toggle" aria-expanded="false" aria-controls="nav-drawer" aria-label="Open navigation">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav__drawer" id="nav-drawer" hidden>
+    <a href="#about">About</a>
+    <a href="#research">Research</a>
+    <a href="#projects">Projects</a>
+    <a href="#experience">Experience</a>
+    <a href="#skills">Skills</a>
+    <a href="#leadership">Leadership</a>
+    <a href="#contact">Contact</a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ═══════════ HERO ═══════════ -->
+<section class="hero" id="hero">
+  <div class="hero__grid" aria-hidden="true" data-parallax data-speed="-0.06"></div>
+
+  <div class="shell hero__shell">
+    <p class="hero__eyebrow" data-hero="1">
+      <span class="dot" aria-hidden="true"></span>
+      B.Tech CSE · Amity School of Engineering &amp; Technology · 2025&ndash;2029
+    </p>
+
+    <h1 class="hero__title" data-hero="2">
+      <span class="split" data-split>Anuansh Tiwari</span>
+    </h1>
+
+    <p class="hero__lede" data-hero="3">
+      I research how generative AI breaks &mdash; <em>and build tools that don&rsquo;t.</em>
+    </p>
+
+    <ul class="hero__facts" data-hero="4">
+      <li>Amity University Uttar Pradesh, Lucknow</li>
+      <li>CGPA 7.48&thinsp;/&thinsp;10</li>
+      <li>IEEE Student Member</li>
+      <li>Lucknow, India</li>
+    </ul>
+
+    <div class="hero__links" data-hero="5">
+      <a class="btn btn--primary magnetic" href="mailto:anuanshtiwari191@gmail.com">
+        <span>anuanshtiwari191@gmail.com</span>
+      </a>
+      <a class="btn magnetic" href="https://github.com/glassgotlazy" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn magnetic" href="https://linkedin.com/in/anuansh" target="_blank" rel="noopener">LinkedIn</a>
+      <a class="btn magnetic" href="https://orcid.org/0009-0007-4226-7925" target="_blank" rel="noopener">ORCID&nbsp;<span class="btn__mono">0009-0007-4226-7925</span></a>
+      <a class="btn magnetic" href="tel:+919871503105">+91&nbsp;98715&nbsp;03105</a>
+    </div>
+  </div>
+
+  <div class="hero__cue" data-hero="6" aria-hidden="true">
+    <span class="hero__cue-line"></span>
+    <span class="hero__cue-text">scroll</span>
+  </div>
+</section>
+
+<!-- ═══════════ ABOUT ═══════════ -->
+<section class="section" id="about" data-section="about">
+  <div class="shell">
+    <header class="sec-head" data-reveal>
+      <span class="sec-head__idx">01</span>
+      <h2 class="sec-head__title">Measurement first</h2>
+      <p class="sec-head__sub">Claims are cheap. I build the corpus, run the experiment, and publish the numbers.</p>
+    </header>
+
+    <div class="about">
+      <div class="about__prose" data-reveal-group>
+        <p data-reveal class="lede">
+          I work on the failure surface of generative AI: where safety filters give way, where agentic
+          systems inherit vulnerabilities, where synthetic media erodes the assumption that evidence is
+          evidence.
+        </p>
+        <p data-reveal>
+          My method is first-party and reproducible. Survey claims get grounded in experiments I run
+          myself &mdash; an <strong>n&nbsp;=&nbsp;880 prompt corpus</strong> probing safety-filter behaviour,
+          CVE data verified against the NVD rather than recycled from secondary write-ups, and figure
+          pipelines in matplotlib that regenerate every plot from the source data so a paper's prose and
+          its charts cannot drift apart.
+        </p>
+        <p data-reveal>
+          The tools I ship follow the same instinct. In the <strong>Offline PDF Toolkit</strong> and
+          <strong>GlucoLog&nbsp;Pro</strong>, nothing leaves the browser &mdash; not because a policy page
+          says so, but because there is no server to send it to. Privacy as architecture, not as a promise.
+        </p>
+      </div>
+
+      <aside class="about__pillars" data-reveal-group>
+        <div class="pillar" data-reveal>
+          <span class="pillar__k">01</span>
+          <h3>First-party experiments</h3>
+          <p>Prompt corpora built and run in-house, with measured filter-performance results.</p>
+        </div>
+        <div class="pillar" data-reveal>
+          <span class="pillar__k">02</span>
+          <h3>Verified sources</h3>
+          <p>CVE records checked against the NVD; incidents, rulings and statistics traced to origin.</p>
+        </div>
+        <div class="pillar" data-reveal>
+          <span class="pillar__k">03</span>
+          <h3>Reproducible figures</h3>
+          <p>matplotlib pipelines that regenerate every figure from data on each build.</p>
+        </div>
+      </aside>
+    </div>
+
+    <div class="counters" data-reveal-group>
+      <div class="counter" data-reveal>
+        <span class="counter__num" data-count="53">0</span>
+        <span class="counter__label">PDF tools running client-side<br><i>Offline PDF Toolkit</i></span>
+      </div>
+      <div class="counter" data-reveal>
+        <span class="counter__num" data-count="880">0</span>
+        <span class="counter__label">prompts in the safety-filter corpus<br><i>first-party experiment</i></span>
+      </div>
+      <div class="counter" data-reveal>
+        <span class="counter__num" data-count="75">0</span>
+        <span class="counter__label">sources reviewed<br><i>resume-screening review</i></span>
+      </div>
+      <div class="counter" data-reveal>
+        <span class="counter__num" data-count="51">0</span>
+        <span class="counter__label">studies in the coded corpus<br><i>resume-screening review</i></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ RESEARCH ═══════════ -->
+<section class="section" id="research" data-section="research">
+  <div class="shell">
+    <header class="sec-head" data-reveal>
+      <span class="sec-head__idx">02</span>
+      <h2 class="sec-head__title">Research &amp; publications</h2>
+      <p class="sec-head__sub">Surveys, reviews and measurements on how generative systems fail.</p>
+    </header>
+
+    <div class="papers" data-reveal-group>
+
+      <article class="paper" data-reveal data-tilt>
+        <div class="paper__top">
+          <span class="paper__idx">P&thinsp;01</span>
+          <span class="tag tag--live">Presented</span>
+        </div>
+        <h3 class="paper__title">Weaponizing Generative AI: A Survey of LLM-Enabled Cyberattacks in Phishing, Malware Generation, and Social Engineering</h3>
+        <p class="paper__venue">ICETA 2026 &middot; NITRA Technical Campus, Ghaziabad &middot; 17&ndash;18 July 2026</p>
+        <p class="paper__body">
+          A survey of offensive uses of large language models across phishing, malware generation and
+          social engineering, anchored by a first-party safety-filter experiment over an
+          <strong>n&nbsp;=&nbsp;880</strong> prompt corpus.
+        </p>
+        <ul class="chips">
+          <li>LLM abuse</li><li>Phishing</li><li>Malware generation</li><li>Safety filters</li><li>n=880 corpus</li>
+        </ul>
+        <p class="todo">TODO: add DOI / proceedings link once indexed</p>
+      </article>
+
+      <article class="paper" data-reveal data-tilt>
+        <div class="paper__top">
+          <span class="paper__idx">P&thinsp;02</span>
+          <span class="tag">IEEE review · four authors</span>
+        </div>
+        <h3 class="paper__title">Agentic AI Security, Reliability and Trust</h3>
+        <p class="paper__venue">Four-author IEEE review</p>
+        <p class="paper__body">
+          A review of the security, reliability and trust surface of agentic AI systems, built on
+          NVD-verified CVE data and measured filter-performance results rather than secondary summaries.
+        </p>
+        <ul class="chips">
+          <li>Agentic AI</li><li>Threat modelling</li><li>NVD / CVE</li><li>Reliability</li>
+        </ul>
+        <p class="todo">TODO: add DOI / preprint link</p>
+      </article>
+
+      <article class="paper" data-reveal data-tilt>
+        <div class="paper__top">
+          <span class="paper__idx">P&thinsp;03</span>
+          <span class="tag">Conference talk · 8 min</span>
+        </div>
+        <h3 class="paper__title">AI-Based Resume Screening Systems: A Critical Review of Techniques, Failure Cases, and Industry Adoption (2024&ndash;2026)</h3>
+        <p class="paper__venue">Springer format &middot; delivered as an 8-minute conference talk</p>
+        <p class="paper__body">
+          A PRISMA-informed critical review over <strong>75 sources</strong>, narrowed to a
+          <strong>51-study</strong> coded corpus, covering screening techniques, documented failure cases
+          and the state of industry adoption.
+        </p>
+        <ul class="chips">
+          <li>PRISMA-informed</li><li>75 sources</li><li>51 coded studies</li><li>Hiring algorithms</li><li>Springer</li>
+        </ul>
+        <p class="todo">TODO: add DOI / proceedings link</p>
+      </article>
+
+      <article class="paper" data-reveal data-tilt>
+        <div class="paper__top">
+          <span class="paper__idx">P&thinsp;04</span>
+          <span class="tag">10-page IEEE paper</span>
+        </div>
+        <h3 class="paper__title">Deepfakes and the Collapse of AI Trust</h3>
+        <p class="paper__venue">NITRA 2026 &middot; 10-page IEEE paper</p>
+        <p class="paper__body">
+          On synthetic media and the erosion of evidentiary trust. Every incident, ruling and statistic in
+          the paper is source-verified back to its origin.
+        </p>
+        <ul class="chips">
+          <li>Deepfakes</li><li>Synthetic media</li><li>Evidence &amp; law</li><li>Source verification</li>
+        </ul>
+        <p class="todo">TODO: add DOI / proceedings link</p>
+      </article>
+
+      <article class="paper" data-reveal data-tilt>
+        <div class="paper__top">
+          <span class="paper__idx">P&thinsp;05</span>
+          <span class="tag tag--wait">Accepted · awaiting indexing</span>
+        </div>
+        <h3 class="paper__title">A Survey of LLM Limitations</h3>
+        <p class="paper__venue">IEEE two-column</p>
+        <p class="paper__body">
+          A survey of the known limitations of large language models. Accepted; awaiting indexing.
+        </p>
+        <ul class="chips">
+          <li>LLM limitations</li><li>Survey</li><li>IEEE two-column</li>
+        </ul>
+        <p class="todo">TODO: add DOI once indexed</p>
+      </article>
+
+      <article class="paper" data-reveal data-tilt>
+        <div class="paper__top">
+          <span class="paper__idx">P&thinsp;06</span>
+          <span class="tag tag--wip">In progress</span>
+        </div>
+        <h3 class="paper__title">Post-Quantum TLS 1.3 Handshake Performance</h3>
+        <p class="paper__venue">In progress</p>
+        <p class="paper__body">
+          Benchmarking ML-KEM hybrid key exchange against classical TLS&nbsp;1.3 handshakes.
+        </p>
+        <ul class="chips">
+          <li>Post-quantum</li><li>ML-KEM</li><li>TLS 1.3</li><li>Benchmarking</li>
+        </ul>
+        <p class="todo">TODO: add results / preprint link when the work lands</p>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ PROJECTS ═══════════ -->
+<section class="section" id="projects" data-section="projects">
+  <div class="shell">
+    <header class="sec-head" data-reveal>
+      <span class="sec-head__idx">03</span>
+      <h2 class="sec-head__title">Projects</h2>
+      <p class="sec-head__sub">Offline-first tools, research pipelines and measurement harnesses.</p>
+    </header>
+
+    <div class="projects" data-reveal-group>
+
+      <article class="project project--wide" data-reveal data-tilt>
+        <div class="project__shot" aria-hidden="true"><span>TODO: screenshot</span></div>
+        <div class="project__body">
+          <h3 class="project__title">Offline PDF Toolkit</h3>
+          <p class="project__desc">
+            <strong>53 PDF tools</strong> running entirely client-side. No server, no upload &mdash; the
+            document never leaves the browser.
+          </p>
+          <ul class="chips">
+            <li>JavaScript</li><li>Client-side</li><li>Offline-first</li><li>Zero upload</li>
+          </ul>
+          <p class="todo">TODO: add live demo URL &amp; repo link</p>
+        </div>
+      </article>
+
+      <article class="project" data-reveal data-tilt>
+        <div class="project__shot" aria-hidden="true"><span>TODO: screenshot</span></div>
+        <div class="project__body">
+          <h3 class="project__title">GlucoLog Pro</h3>
+          <p class="project__desc">
+            An offline single-HTML health tracker with a CGM screenshot digitizer, Whoop integration and
+            Web Bluetooth device support.
+          </p>
+          <ul class="chips">
+            <li>Single-HTML</li><li>Offline</li><li>Web Bluetooth</li><li>Whoop API</li><li>Image digitizer</li>
+          </ul>
+          <p class="todo">TODO: add live demo URL &amp; repo link</p>
+        </div>
+      </article>
+
+      <article class="project" data-reveal data-tilt>
+        <div class="project__shot" aria-hidden="true"><span>TODO: screenshot</span></div>
+        <div class="project__body">
+          <h3 class="project__title">Amity Admissions Assistant</h3>
+          <p class="project__desc">
+            A Node.js / Express chatbot backed by Google Gemini, with a voice-callback channel built on
+            ElevenLabs and Twilio.
+          </p>
+          <ul class="chips">
+            <li>Node.js</li><li>Express</li><li>Gemini API</li><li>ElevenLabs</li><li>Twilio</li>
+          </ul>
+          <p class="todo">TODO: add live demo URL &amp; repo link</p>
+        </div>
+      </article>
+
+      <article class="project" data-reveal data-tilt>
+        <div class="project__shot" aria-hidden="true"><span>TODO: screenshot</span></div>
+        <div class="project__body">
+          <h3 class="project__title">paper-forge / doc-refine</h3>
+          <p class="project__desc">
+            Pipelines that draft, review, score and reformat papers to IEEE and Springer templates, with
+            figures generated programmatically from the underlying data.
+          </p>
+          <ul class="chips">
+            <li>Python</li><li>LaTeX</li><li>matplotlib</li><li>IEEE / Springer</li><li>Claude API</li>
+          </ul>
+          <p class="todo">TODO: add repo link</p>
+        </div>
+      </article>
+
+      <article class="project" data-reveal data-tilt>
+        <div class="project__shot" aria-hidden="true"><span>TODO: screenshot</span></div>
+        <div class="project__body">
+          <h3 class="project__title">Zero-Shot vs Chain-of-Thought Prompting Study</h3>
+          <p class="project__desc">
+            A controlled comparison: 15 questions &times; 3 runs &times; 2 prompting styles, scored against a
+            6-point rubric and run through the Claude API.
+          </p>
+          <ul class="chips">
+            <li>Claude API</li><li>Prompt evaluation</li><li>6-point rubric</li><li>pandas</li>
+          </ul>
+          <p class="todo">TODO: add repo link &amp; results write-up</p>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ EXPERIENCE ═══════════ -->
+<section class="section" id="experience" data-section="experience">
+  <div class="shell">
+    <header class="sec-head" data-reveal>
+      <span class="sec-head__idx">04</span>
+      <h2 class="sec-head__title">Experience</h2>
+      <p class="sec-head__sub">Telecom security, research and field programmes.</p>
+    </header>
+
+    <ol class="timeline" data-reveal-group>
+      <li class="tl" data-reveal>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <span class="tl__when">Jun&ndash;Sep 2026</span>
+        <div class="tl__body">
+          <h3>Industrial Trainee &mdash; BSNL ALTTC, Ghaziabad</h3>
+          <p>Integrated Telecom &amp; Data Networks and Cyber Security.</p>
+        </div>
+      </li>
+      <li class="tl" data-reveal>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <span class="tl__when">Jun&ndash;Jul 2026</span>
+        <div class="tl__body">
+          <h3>NTCC Research Intern &mdash; Amity University, Lucknow</h3>
+          <p>Non-Teaching Credit Course research internship.</p>
+        </div>
+      </li>
+      <li class="tl" data-reveal>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <span class="tl__when">Jun&ndash;Jul 2026</span>
+        <div class="tl__body">
+          <h3>HVCO Intern &mdash; Yuva Yoddha</h3>
+          <p>Legal-rights awareness campaign. Certificate of Appreciation.</p>
+        </div>
+      </li>
+      <li class="tl" data-reveal>
+        <span class="tl__dot" aria-hidden="true"></span>
+        <span class="tl__when">Jun&ndash;Sep 2026</span>
+        <div class="tl__body">
+          <h3>Programme Intern &mdash; Each One Feed One, New Delhi</h3>
+          <p>Programme support.</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═══════════ SKILLS ═══════════ -->
+<section class="section" id="skills" data-section="skills">
+  <div class="shell">
+    <header class="sec-head" data-reveal>
+      <span class="sec-head__idx">05</span>
+      <h2 class="sec-head__title">Skills</h2>
+      <p class="sec-head__sub">Languages, data tooling, model APIs and the security work they serve.</p>
+    </header>
+
+    <div class="skills" data-reveal-group>
+      <div class="skillset" data-reveal>
+        <h3>Languages</h3>
+        <ul class="chips chips--lg" data-stagger>
+          <li>Python</li><li>JavaScript</li><li>C</li><li>LaTeX</li>
+        </ul>
+      </div>
+      <div class="skillset" data-reveal>
+        <h3>Backend &amp; web</h3>
+        <ul class="chips chips--lg" data-stagger>
+          <li>Node.js</li><li>Express</li><li>REST APIs</li>
+        </ul>
+      </div>
+      <div class="skillset" data-reveal>
+        <h3>Data &amp; ML</h3>
+        <ul class="chips chips--lg" data-stagger>
+          <li>pandas</li><li>NumPy</li><li>scikit-learn</li><li>matplotlib</li><li>TF-IDF</li><li>NLP</li>
+        </ul>
+      </div>
+      <div class="skillset" data-reveal>
+        <h3>AI tooling</h3>
+        <ul class="chips chips--lg" data-stagger>
+          <li>Claude API</li><li>Gemini API</li><li>ElevenLabs</li><li>Twilio</li><li>Claude Code</li><li>Cursor</li>
+        </ul>
+      </div>
+      <div class="skillset skillset--wide" data-reveal>
+        <h3>Security research</h3>
+        <ul class="chips chips--lg" data-stagger>
+          <li>LLM &amp; prompt-injection security</li><li>Agentic-AI threat modelling</li><li>CVE / NVD analysis</li><li>ML-KEM</li><li>TLS 1.3</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ LEADERSHIP ═══════════ -->
+<section class="section" id="leadership" data-section="leadership">
+  <div class="shell">
+    <header class="sec-head" data-reveal>
+      <span class="sec-head__idx">06</span>
+      <h2 class="sec-head__title">Leadership</h2>
+      <p class="sec-head__sub">Professional community and chapter building.</p>
+    </header>
+
+    <div class="lead" data-reveal-group>
+      <div class="lead__card" data-reveal data-tilt>
+        <h3>IEEE Student Member</h3>
+        <p>Member of the IEEE student community.</p>
+      </div>
+      <div class="lead__card" data-reveal data-tilt>
+        <h3>ACM Student Chapter &mdash; chartering effort</h3>
+        <p>Leading the effort to charter an ACM Student Chapter at Amity University, Lucknow.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ CONTACT ═══════════ -->
+<section class="section section--contact" id="contact" data-section="contact">
+  <div class="shell">
+    <div class="cta" data-reveal-group>
+      <p class="cta__eyebrow" data-reveal>07 &mdash; Contact</p>
+      <h2 class="cta__title" data-reveal>
+        <span class="split" data-split>Let&rsquo;s compare notes.</span>
+      </h2>
+      <p class="cta__sub" data-reveal>
+        Open to research collaboration, conference conversations and internship opportunities in AI
+        security and applied cryptography.
+      </p>
+
+      <div class="cta__actions" data-reveal>
+        <a class="btn btn--primary btn--lg magnetic" href="mailto:anuanshtiwari191@gmail.com">anuanshtiwari191@gmail.com</a>
+        <a class="btn btn--lg magnetic" href="tel:+919871503105">+91&nbsp;98715&nbsp;03105</a>
+      </div>
+
+      <ul class="cta__links" data-reveal>
+        <li><a href="https://github.com/glassgotlazy" target="_blank" rel="noopener">github.com/glassgotlazy</a></li>
+        <li><a href="https://linkedin.com/in/anuansh" target="_blank" rel="noopener">linkedin.com/in/anuansh</a></li>
+        <li><a href="https://orcid.org/0009-0007-4226-7925" target="_blank" rel="noopener">ORCID 0009-0007-4226-7925</a></li>
+      </ul>
+      <p class="todo todo--center" data-reveal>TODO: add CV / résumé PDF link</p>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <div class="shell foot__inner">
+      <span>Anuansh Tiwari &middot; Lucknow, India</span>
+      <span class="foot__mono">B.Tech CSE 2025&ndash;2029 &middot; CGPA 7.48/10 &middot; IEEE Student Member</span>
+    </div>
+  </footer>
+</section>
+
+</main>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>
