@@ -124,10 +124,22 @@ The page carries visible `TODO` markers everywhere a real artefact is still need
 these are fabricated — fill them in as they exist:
 
 - DOI / proceedings links for each paper
-- Live demo URLs and repo links for each project
-- Project screenshots (the striped placeholders in `.project__shot`)
+- Live demo URLs for the Offline PDF Toolkit and GlucoLog Pro
+- Repo link and live demo URL for the Amity Admissions Assistant
 - CV / résumé PDF link in the contact section
 - `og:url` and `og:image` in `<head>`, once the site is deployed
+- An audio file at `assets/audio/ambient.mp3` (see that folder's README)
+
+## Project images
+
+`assets/img/` holds the project screenshots, converted to WebP at 1100px wide (236KB for
+all five). They are held to the page's greyscale with
+`filter: grayscale(1) contrast(1.06) brightness(.7)` and bloom into their own colour on
+hover, so a teal app and a purple one do not fight the monochrome palette. The two
+multi-view projects cross-fade to a second screenshot on hover.
+
+Every image carries descriptive alt text and explicit `width`/`height` to avoid layout
+shift, and all but the first are `loading="lazy"`.
 
 ## Visual language
 

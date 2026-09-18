@@ -529,18 +529,42 @@ a{color:inherit;text-decoration:none}
 }
 .project:hover{background:var(--bg-2)}
 .project__shot{
-  position:relative;aspect-ratio:16/9;flex:none;display:grid;place-items:center;
-  border-bottom:1px solid var(--line);
-  background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 10px,transparent 10px 20px),#0a0a0a;
-  overflow:hidden;
+  position:relative;aspect-ratio:4/3;flex:none;
+  border-bottom:1px solid var(--line);background:#0a0a0a;overflow:hidden;
 }
-.project__shot span{font-family:var(--font-mono);font-size:10px;letter-spacing:.06em;color:#ffb44d;padding:6px 11px;border:1px dashed rgba(255,180,77,.4)}
+/* screenshots are held to the page's greyscale and only bloom into their own
+   colour on hover, so a teal app and a purple one do not fight the palette */
+.project__shot img{
+  position:absolute;inset:0;z-index:0;
+  width:100%;height:100%;display:block;
+  object-fit:cover;object-position:top center;
+  filter:grayscale(1) contrast(1.06) brightness(.7);
+  transition:filter .6s var(--ease),transform .9s var(--ease),opacity .55s var(--ease);
+}
+.project__alt{opacity:0}
+.project:hover .project__shot img{filter:none;transform:scale(1.03)}
+.project:hover .project__alt{opacity:1}
 .project__shot::before{
-  content:"";position:absolute;inset:0;
-  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.07) 50%,transparent 65%);
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.12) 50%,transparent 65%);
   transform:translateX(-110%);transition:transform .9s var(--ease);
 }
 .project:hover .project__shot::before{transform:translateX(110%)}
+
+.project__links{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:auto 0 0}
+.project__links a{
+  position:relative;font-family:var(--font-mono);font-size:11px;letter-spacing:.04em;
+  text-transform:uppercase;color:var(--text);padding-bottom:3px;
+}
+.project__links a::after{
+  content:" \2197";font-size:10px;
+}
+.project__links a::before{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:currentColor;
+  transform:scaleX(0);transform-origin:100% 50%;transition:transform .45s var(--ease);
+}
+.project__links a:hover::before{transform:scaleX(1);transform-origin:0 50%}
+.project__links .todo{margin:0}
 .project__body{padding:clamp(22px,3vw,34px);display:flex;flex-direction:column}
 .project__title{font-size:clamp(1.4rem,3.2vw,2.4rem);margin-bottom:12px;letter-spacing:-.04em;transition:transform .5s var(--ease)}
 .project:hover .project__title{transform:translateX(6px)}
@@ -548,7 +572,7 @@ a{color:inherit;text-decoration:none}
 @media (min-width:820px){
   .projects{grid-template-columns:repeat(2,1fr)}
   .project--wide{grid-column:1 / -1;flex-direction:row;align-items:stretch}
-  .project--wide .project__shot{width:46%;aspect-ratio:auto;min-height:280px;border-bottom:0;border-right:1px solid var(--line)}
+  .project--wide .project__shot{width:46%;aspect-ratio:auto;min-height:340px;border-bottom:0;border-right:1px solid var(--line)}
   .project--wide .project__body{flex:1;justify-content:center}
 }
 
@@ -703,6 +727,7 @@ a{color:inherit;text-decoration:none}
   .hero__cue-line{animation:none;opacity:.5}
   .dot,.tag__dot{animation:none}
   .project__shot::before,.btn::after{display:none}
+  .project:hover .project__shot img{transform:none}
   .btn:hover,.copy:hover,.chips li:hover,.pill:hover{transform:none}
   .paper:hover .paper__title,.project:hover .project__title{transform:none}
   .pillar:hover,.tl:hover,.lead__card:hover{padding-left:0}
