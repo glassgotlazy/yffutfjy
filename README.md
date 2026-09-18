@@ -53,10 +53,25 @@ What's on the page:
 - **Scroll progress** — `--sp` (0→1) is written to `:root` once per frame; the progress
   bar, the nav percentage readout and the background gradient all read from it.
 - **Background** — a fixed gradient whose hue and focal points track `--sp` (lime at the
-  top → violet at the bottom), three slow-drifting parallaxed aurora orbs, and a canvas
-  node field whose colour tracks `--sp`, whose drift speeds up with scroll velocity, and
-  which parts around the pointer. Particle count scales with viewport area, drops on
-  coarse-pointer devices, and the loop stops when the tab is hidden.
+  top → violet at the bottom), three slow-drifting parallaxed aurora orbs, and a live
+  backdrop over the top.
+
+  The backdrop is a WebGL2 fragment shader: domain-warped fbm, a palette that travels with
+  scroll, a swell under the pointer, a vignette that holds the centre back so body copy
+  keeps its contrast, and an ordered dither — dark gradients band visibly at 8 bits without
+  one. It renders below device resolution because a full-screen shader is fill-rate bound.
+
+  If WebGL is missing, the context is lost, or the shader turns out to be too slow (a
+  software rasteriser with no GPU can be far slower than what it replaced), it hands over
+  to a canvas-2D node field that tracks the same `--sp`, speeds up with scroll velocity and
+  parts around the pointer. The handover is measured live, not assumed: frame cost is
+  sampled every 20 frames, the resolution halves once, and then it steps down entirely.
+  `document.documentElement.dataset.bg` reports which renderer is live (`gl`, `2d`,
+  `2d-degraded`, `2d-recovered`), which is what the tests assert against.
+
+  Each renderer builds its own canvas. A canvas can only ever hand out one kind of context,
+  so a shared one would leave the fallback unable to draw — and the dead renderer's last
+  frame frozen on screen.
 
   The orbs get their softness from multi-stop radial gradients, not `filter: blur()`. A
   90px blur on elements that size cost around 40fps by itself. Each orb is also split in
@@ -97,9 +112,11 @@ clears, the footer is reachable at maximum scroll, nav and rail anchors land on 
 the scroll-lit paragraph fills, and the decode effect restores its labels — in all three
 modes.
 
-Frame rate is measured under software rasterisation (no GPU), so real hardware is better:
-~49fps while scrolling on desktop, ~59fps on a 4×-throttled mobile profile. `perf.js` and
-`bisect.js` in the verification scripts measure this and attribute cost per layer.
+Frame rate is measured under software rasterisation on a shared container, so absolute
+numbers are noisy and well below real hardware. Treat them as **relative** only: compare a
+change against the previous commit under identical browser flags, which is what the
+verification scripts do. `bisect.js` attributes cost per layer by disabling one at a time —
+that is how the `filter: blur()` cost below was found.
 
 ## Outstanding TODOs
 

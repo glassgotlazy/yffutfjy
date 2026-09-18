@@ -367,7 +367,7 @@
 
     litPass(y);
     sweep(y);
-    field.scroll(sp, velocity);
+    bg.scroll(sp, velocity);
   }
 
   /* paragraph that fills word by word as it crosses the viewport */
@@ -529,10 +529,19 @@
     });
   }
 
+  /* A canvas's context type is permanent, so each renderer gets a fresh
+     one; handing over means discarding the old canvas entirely. */
+  function makeCanvas() {
+    const host = $('#field-host');
+    if (!host) return null;
+    const c = document.createElement('canvas');
+    host.appendChild(c);
+    return c;
+  }
+
   /* ───────────── 11. generative background field ───────────── */
   const field = (() => {
-    const canvas = $('#field-canvas');
-    const ctx = canvas ? canvas.getContext('2d', { alpha: true }) : null;
+    let canvas = null, ctx = null;
     let w = 0, h = 0, dpr = 1, nodes = [], raf = 0, running = false;
     let progress = 0, vel = 0, hue = 78, px = -1, py = -1;
 
@@ -630,6 +639,10 @@
 
     return {
       init() {
+        if (ctx) return;
+        canvas = makeCanvas();
+        if (!canvas) return;
+        ctx = canvas.getContext('2d', { alpha: true });
         if (!ctx) return;
         size();
         if (!calm) start();
@@ -647,6 +660,257 @@
       start, stop
     };
   })();
+
+  /* ───────────── 11b. WebGL backdrop ─────────────
+     A single full-screen fragment shader: domain-warped fbm, a palette
+     that travels with scroll, a swell under the pointer, and an ordered
+     dither because dark gradients band badly at 8 bits. Falls back to the
+     canvas-2D field if WebGL is missing or the context is lost. */
+  const shader = (() => {
+    let canvas = null;
+    let gl = null, prog = null, raf = 0, running = false, lost = false;
+    let u = {}, w = 0, h = 0, res = 1, scale = 0.75;
+    let progress = 0, vel = 0, mx = 0.5, my = 0.5, born = 0;
+    // a full-screen shader on a software rasteriser (SwiftShader, no GPU)
+    // can be far slower than the 2D field it replaced, so the cost is
+    // measured live and the effect steps itself down rather than assuming
+    let samples = 0, acc = 0, stepped = 0, lastFrame = 0;
+
+    const VERT = `#version 300 es
+in vec2 p;
+void main(){ gl_Position = vec4(p, 0.0, 1.0); }`;
+
+    const FRAG = `#version 300 es
+precision highp float;
+out vec4 o;
+uniform vec2  uRes;
+uniform float uT;    // seconds
+uniform float uP;    // 0..1 scroll progress
+uniform vec2  uM;    // pointer, normalised
+uniform float uV;    // scroll velocity
+
+float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123); }
+
+float noise(vec2 p){
+  vec2 i = floor(p), f = fract(p);
+  vec2 s = f * f * (3.0 - 2.0 * f);
+  return mix(mix(hash(i),               hash(i + vec2(1.0, 0.0)), s.x),
+             mix(hash(i + vec2(0.0,1.0)), hash(i + vec2(1.0, 1.0)), s.x), s.y);
+}
+
+float fbm(vec2 p){
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 5; i++){
+    v += a * noise(p);
+    p = p * 2.03 + vec2(1.7, 9.2);
+    a *= 0.5;
+  }
+  return v;
+}
+
+void main(){
+  vec2 uv = gl_FragCoord.xy / uRes;
+  float ar = uRes.x / uRes.y;
+  vec2 q = vec2(uv.x * ar, uv.y);
+
+  float t = uT * 0.035;
+
+  // domain warp — what stops it reading as plain noise
+  vec2 warp = vec2(fbm(q * 1.6 + vec2(t, -t * 0.7)),
+                   fbm(q * 1.6 + vec2(5.2 - t, 1.3 + t)));
+  float n = fbm(q * 2.1 + warp * 0.9 + vec2(0.0, t * 0.5));
+
+  // the field swells under the pointer
+  float d = distance(q, vec2(uM.x * ar, uM.y));
+  n += smoothstep(0.40, 0.0, d) * 0.11;
+
+  // palette travels with scroll: lime -> cyan -> violet, matching --sp
+  vec3 lime   = vec3(0.776, 0.949, 0.306);
+  vec3 cyan   = vec3(0.235, 0.718, 1.000);
+  vec3 violet = vec3(0.620, 0.440, 1.000);
+  vec3 a = mix(lime, cyan,   smoothstep(0.00, 0.55, uP));
+  vec3 b = mix(cyan, violet, smoothstep(0.45, 1.00, uP));
+  vec3 col = mix(a, b, smoothstep(0.25, 0.85, n));
+
+  float amt = pow(smoothstep(0.30, 0.95, n), 2.0) * (0.42 + uV * 0.10);
+
+  // hold the centre back so body copy keeps its contrast
+  amt *= smoothstep(0.06, 0.78, length(uv - 0.5) * 1.35);
+
+  // ordered dither: without this, a dark ramp bands visibly on 8-bit panels
+  float dither = (hash(gl_FragCoord.xy + fract(uT)) - 0.5) / 255.0;
+
+  o = vec4(col, clamp(amt, 0.0, 0.52) + dither);
+}`;
+
+    function compile(type, src){
+      const s = gl.createShader(type);
+      gl.shaderSource(s, src);
+      gl.compileShader(s);
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+        gl.deleteShader(s);
+        return null;
+      }
+      return s;
+    }
+
+    // release the GPU context and drop the canvas, so the 2D fallback can
+    // start from a clean element instead of one it can never draw on
+    function retire(){
+      running = false;
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      try { gl?.getExtension('WEBGL_lose_context')?.loseContext(); } catch { /* already gone */ }
+      gl = null;
+      canvas?.remove();
+      canvas = null;
+    }
+
+    function handOver(tag){
+      if (lost) return;          // loseContext() re-enters through the event
+      lost = true;
+      retire();
+      field.init();
+      field.start();
+      bg.which = field;
+      root.dataset.bg = tag;
+    }
+
+    function size(){
+      if (!gl) return;
+      // a full-screen fragment shader is fill-rate bound, so render below
+      // device resolution and let the compositor scale it up
+      res = Math.min(window.devicePixelRatio || 1, 1.5) * scale;
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width  = Math.max(1, Math.round(w * res));
+      canvas.height = Math.max(1, Math.round(h * res));
+      gl.viewport(0, 0, canvas.width, canvas.height);
+    }
+
+    function frame(now){
+      raf = 0;
+      if (!running || !gl) return;
+
+      if (lastFrame) {
+        acc += now - lastFrame;
+        if (++samples >= 20) {
+          const avg = acc / samples;
+          samples = 0; acc = 0;
+          if (avg > 26) {                    // under ~38fps
+            if (stepped === 0) { stepped = 1; scale = 0.45; size(); }
+            else {                           // still too slow — hand over
+              stepped = 2;
+              lastFrame = 0;
+              handOver('2d-degraded');
+              return;
+            }
+          }
+        }
+      }
+      lastFrame = now;
+
+      gl.uniform2f(u.res, canvas.width, canvas.height);
+      gl.uniform1f(u.t, (performance.now() - born) / 1000);
+      gl.uniform1f(u.p, progress);
+      gl.uniform2f(u.m, mx, my);
+      gl.uniform1f(u.v, Math.min(vel / 60, 1.2));
+      gl.drawArrays(gl.TRIANGLES, 0, 3);
+      raf = requestAnimationFrame(frame);
+    }
+
+    return {
+      init(){
+        canvas = makeCanvas();
+        if (!canvas) return false;
+        try {
+          gl = canvas.getContext('webgl2', {
+            alpha: true, premultipliedAlpha: false,
+            antialias: false, depth: false, stencil: false,
+            powerPreference: 'low-power'
+          });
+        } catch { gl = null; }
+        if (!gl) return false;
+
+        const vs = compile(gl.VERTEX_SHADER, VERT);
+        const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+        if (!vs || !fs) { retire(); return false; }
+
+        prog = gl.createProgram();
+        gl.attachShader(prog, vs);
+        gl.attachShader(prog, fs);
+        gl.linkProgram(prog);
+        if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { retire(); return false; }
+        gl.useProgram(prog);
+
+        // one oversized triangle covers the viewport with no index buffer
+        const buf = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+        const loc = gl.getAttribLocation(prog, 'p');
+        gl.enableVertexAttribArray(loc);
+        gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+        u = {
+          res: gl.getUniformLocation(prog, 'uRes'),
+          t:   gl.getUniformLocation(prog, 'uT'),
+          p:   gl.getUniformLocation(prog, 'uP'),
+          m:   gl.getUniformLocation(prog, 'uM'),
+          v:   gl.getUniformLocation(prog, 'uV'),
+        };
+
+        born = performance.now();
+        size();
+
+        canvas.addEventListener('webglcontextlost', (e) => {
+          e.preventDefault();
+          handOver('2d-recovered');
+        });
+
+        let rt;
+        window.addEventListener('resize', () => {
+          clearTimeout(rt);
+          rt = setTimeout(size, 160);
+        }, { passive: true });
+        document.addEventListener('visibilitychange', () => {
+          document.hidden ? this.stop() : this.start();
+        });
+
+        if (!calm) this.start();
+        return true;
+      },
+      start(){
+        if (!gl || calm || running || lost) return;
+        running = true;
+        if (!raf) raf = requestAnimationFrame(frame);
+      },
+      stop(){
+        running = false;
+        lastFrame = 0;
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+        if (gl) { gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT); }
+      },
+      scroll(p, v){ progress = p; vel = v; },
+      pointer(x, y){
+        if (x < 0) { mx = my = -1; return; }
+        mx = x / window.innerWidth;
+        my = 1 - y / window.innerHeight;   // GL origin is bottom-left
+      }
+    };
+  })();
+
+  /* whichever backdrop actually came up */
+  const bg = {
+    which: null,
+    init(){
+      const gl = shader.init();
+      if (!gl) field.init();
+      this.which = gl ? shader : field;
+      root.dataset.bg = gl ? 'gl' : '2d';
+    },
+    scroll(p, v){ this.which?.scroll(p, v); },
+    pointer(x, y){ this.which?.pointer(x, y); },
+    start(){ this.which?.start(); },
+    stop(){ this.which?.stop(); }
+  };
 
   /* ───────────── 12. mobile drawer ───────────── */
   function initDrawer() {
@@ -795,7 +1059,7 @@
     initDecode();
     initMarquee();
     initAnchors();
-    field.init();
+    bg.init();
     cursor.init();
     intro.run();
 
@@ -805,9 +1069,9 @@
     // the field parts around the pointer
     window.addEventListener('pointermove', (e) => {
       if (e.pointerType && e.pointerType !== 'mouse') return;
-      field.pointer(e.clientX, e.clientY);
+      bg.pointer(e.clientX, e.clientY);
     }, { passive: true });
-    window.addEventListener('pointerleave', () => field.pointer(-1, -1), { passive: true });
+    window.addEventListener('pointerleave', () => bg.pointer(-1, -1), { passive: true });
 
     smooth.start();
     measureMetrics();
@@ -829,7 +1093,7 @@
     const onPrefChange = (e) => {
       calm = e.matches;
       if (calm) {
-        field.stop();
+        bg.stop();
         cursor.stop();
         smooth.stop();
         litEls.forEach(el => el.style.removeProperty('--lit'));
@@ -839,7 +1103,7 @@
         $$('.magnetic').forEach(el => { el.style.transform = ''; });
         $$('[data-count]').forEach(el => { el.textContent = el.dataset.count; });
       } else {
-        field.start();
+        bg.start();
         cursor.init();
         smooth.start();
       }

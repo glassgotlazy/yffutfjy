@@ -40,9 +40,10 @@
   <span class="orb orb--2" data-parallax data-speed="0.04"><i></i></span>
   <span class="orb orb--3" data-parallax data-speed="-0.03"><i></i></span>
 </div>
-<div class="field" aria-hidden="true">
-  <canvas id="field-canvas"></canvas>
-</div>
+<!-- the backdrop renderer creates its own canvas here: a canvas can only
+     ever hand out one kind of context, so WebGL and the 2D fallback
+     cannot share one -->
+<div class="field" id="field-host" aria-hidden="true"></div>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- cursor (fine pointers only, built by JS) -->
