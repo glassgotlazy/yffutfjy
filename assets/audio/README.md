@@ -29,3 +29,24 @@ not just a permissive test flag.
 
 Keep the file small. A visitor on mobile data pays for it, so `preload` is set
 to `none` and nothing is fetched until sound is actually requested.
+
+## Use a track you have the right to serve
+
+This file is served publicly from the site, which is redistribution. Only put
+something here that you are licensed to distribute:
+
+- your own recording or mix;
+- a Creative Commons track whose licence allows it — credit the artist in the
+  contact section if the licence requires attribution;
+- a royalty-free track whose licence covers web use.
+
+Audio pulled from a streaming service is none of those, whatever the format. A
+portfolio is exactly the kind of page a rights-holder's automated sweep finds,
+and a takedown lands on the repository and the author's name.
+
+If you want a specific track that you do not hold rights to, embed the
+platform's own player instead of copying the file — that is what it exists for,
+and playback stays with the rights-holder. Note that the platform's terms
+generally require its player to remain visible, and a third-party embed loads
+that platform's scripts and cookies on every visit, which sits awkwardly on a
+site whose own argument is that privacy should be architectural.
