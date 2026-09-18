@@ -75,28 +75,40 @@ body::before{
 
 /* slow-drifting aurora orbs, parallaxed */
 .aurora{position:fixed;inset:0;z-index:-3;pointer-events:none;overflow:hidden}
-.orb{
-  position:absolute;display:block;border-radius:50%;
-  filter:blur(90px);opacity:.3;will-change:transform;
-}
-.orb--1{
-  width:46vw;height:46vw;left:-8vw;top:4vh;
-  background:radial-gradient(circle,rgba(198,242,78,.5),transparent 68%);
+/* The softness is baked into the gradient's stops rather than produced
+   with filter:blur(). A 90px blur on elements this large cost ~40fps on
+   its own; multi-stop radial gradients read the same and are nearly free.
+   The outer span carries the scroll parallax and the inner one the drift,
+   because a CSS animation on transform outranks an inline style and would
+   otherwise silently discard the parallax. Translation only — a scale in
+   the keyframes forces the layer to re-rasterise every frame. */
+.orb{position:absolute;display:block;will-change:transform}
+.orb > i{display:block;width:100%;height:100%;border-radius:50%;will-change:transform}
+
+.orb--1{width:60vw;height:60vw;left:-14vw;top:-4vh}
+.orb--1 > i{
+  background:radial-gradient(circle closest-side,
+    rgba(198,242,78,.22),rgba(198,242,78,.12) 34%,
+    rgba(198,242,78,.045) 58%,rgba(198,242,78,0) 76%);
   animation:drift1 26s var(--ease) infinite alternate;
 }
-.orb--2{
-  width:40vw;height:40vw;right:-6vw;top:38vh;
-  background:radial-gradient(circle,rgba(96,190,255,.42),transparent 68%);
+.orb--2{width:54vw;height:54vw;right:-12vw;top:32vh}
+.orb--2 > i{
+  background:radial-gradient(circle closest-side,
+    rgba(96,190,255,.2),rgba(96,190,255,.1) 34%,
+    rgba(96,190,255,.04) 58%,rgba(96,190,255,0) 76%);
   animation:drift2 32s var(--ease) infinite alternate;
 }
-.orb--3{
-  width:38vw;height:38vw;left:28vw;bottom:-10vh;
-  background:radial-gradient(circle,rgba(168,120,255,.4),transparent 68%);
+.orb--3{width:52vw;height:52vw;left:24vw;bottom:-16vh}
+.orb--3 > i{
+  background:radial-gradient(circle closest-side,
+    rgba(168,120,255,.19),rgba(168,120,255,.1) 34%,
+    rgba(168,120,255,.038) 58%,rgba(168,120,255,0) 76%);
   animation:drift3 38s var(--ease) infinite alternate;
 }
-@keyframes drift1{to{transform:translate3d(9vw,7vh,0) scale(1.15)}}
-@keyframes drift2{to{transform:translate3d(-8vw,-9vh,0) scale(.88)}}
-@keyframes drift3{to{transform:translate3d(6vw,-6vh,0) scale(1.1)}}
+@keyframes drift1{to{transform:translate3d(8vw,6vh,0)}}
+@keyframes drift2{to{transform:translate3d(-7vw,-8vh,0)}}
+@keyframes drift3{to{transform:translate3d(6vw,-5vh,0)}}
 
 .field{position:fixed;inset:0;z-index:-2;pointer-events:none}
 .field canvas{width:100%;height:100%;display:block;opacity:.85}
@@ -327,8 +339,8 @@ a{color:inherit;text-decoration:none}
 }
 
 .hero__title{
-  font-size:clamp(3rem,10.5vw,8.2rem);
-  font-weight:700;letter-spacing:-.045em;line-height:.94;
+  font-size:clamp(3.1rem,11.5vw,9.2rem);
+  font-weight:700;letter-spacing:-.05em;line-height:.9;
   margin-bottom:clamp(18px,3vw,28px);
 }
 
@@ -443,7 +455,7 @@ a{color:inherit;text-decoration:none}
   color:var(--accent);margin-bottom:16px;
 }
 .sec-head__idx::before{content:"//\00a0"}
-.sec-head__title{font-size:clamp(2rem,5.4vw,3.6rem)}
+.sec-head__title{font-size:clamp(2.1rem,6vw,4.2rem);letter-spacing:-.042em}
 .sec-head__rule{
   display:block;height:1px;width:min(220px,40%);
   background:linear-gradient(90deg,var(--accent),transparent);
@@ -765,7 +777,7 @@ a{color:inherit;text-decoration:none}
   text-transform:uppercase;color:var(--accent);margin-bottom:22px;
 }
 .cta__title{
-  font-size:clamp(2.4rem,8vw,5.6rem);font-weight:700;letter-spacing:-.045em;
+  font-size:clamp(2.5rem,8.6vw,6.2rem);font-weight:700;letter-spacing:-.045em;
   margin-bottom:22px;
 }
 .cta__sub{color:var(--muted);max-width:46ch;margin:0 auto 38px;font-size:clamp(15px,1.6vw,17.5px)}
@@ -821,6 +833,77 @@ a{color:inherit;text-decoration:none}
 }
 .toast.is-on{opacity:1;transform:translate(-50%,0) scale(1)}
 
+/* ---------- momentum scroll ----------
+   Native scrolling still drives everything (scrollbar, keyboard, anchors,
+   focus); the content just lags behind it under a transform. Fixed-position
+   chrome lives outside <main>, so it is unaffected. */
+.smooth main{position:fixed;top:0;left:0;width:100%;will-change:transform}
+.smooth{scroll-behavior:auto}
+
+/* ---------- intro curtain ---------- */
+/* display:none by default, so a page with no JS never sees a curtain
+   it has no way to dismiss */
+.intro{
+  position:fixed;inset:0;z-index:300;display:none;
+  align-items:center;justify-content:center;
+  background:var(--bg);
+  transition:transform 1s var(--ease-out);
+}
+.intro.is-live{display:flex}
+.is-intro{overflow:hidden}
+.intro.is-out{transform:translateY(-101%)}
+.intro__inner{display:flex;flex-direction:column;align-items:center;gap:14px;padding:0 var(--gutter)}
+.intro__name{
+  font-family:var(--font-display);font-weight:700;
+  font-size:clamp(1.8rem,6vw,3.4rem);letter-spacing:-.04em;
+  opacity:0;transform:translateY(14px);
+  animation:introIn .7s var(--ease-out) .05s forwards;
+}
+.intro__meta{
+  font-family:var(--font-mono);font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--dim);
+  opacity:0;transform:translateY(10px);
+  animation:introIn .7s var(--ease-out) .16s forwards;
+}
+@keyframes introIn{to{opacity:1;transform:none}}
+.intro__bar{
+  display:block;width:min(240px,50vw);height:1px;margin-top:10px;
+  background:rgba(255,255,255,.12);overflow:hidden;
+}
+.intro__bar > i{
+  display:block;height:100%;width:100%;background:var(--accent);
+  transform:scaleX(0);transform-origin:0 50%;
+}
+
+/* ---------- marquee ---------- */
+.marquee{
+  position:relative;overflow:hidden;
+  border-block:1px solid var(--line);
+  padding:18px 0;background:rgba(255,255,255,.015);
+  mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);
+}
+.marquee__track{display:flex;width:max-content;animation:marquee 38s linear infinite}
+.marquee:hover .marquee__track{animation-play-state:paused}
+.marquee__row{display:flex;align-items:center;gap:26px;padding-right:26px;white-space:nowrap}
+.marquee__row b{
+  font-family:var(--font-display);font-weight:600;
+  font-size:clamp(1.1rem,2.6vw,1.8rem);letter-spacing:-.025em;color:var(--text);
+}
+.marquee__row i{font-style:normal;color:var(--accent);opacity:.5;font-size:1.2rem}
+@keyframes marquee{to{transform:translate3d(-50%,0,0)}}
+
+/* ---------- scroll-lit paragraph ----------
+   One variable (--lit, a running word count) drives every word: each word
+   reads its own index and resolves its own opacity, so the fill tracks the
+   scroll in reading order without touching the DOM per frame. */
+.lit{color:var(--text)}
+.lit .lw{
+  display:inline-block;
+  opacity:clamp(.18, calc(var(--lit,0) - var(--i,0)), 1);
+  transition:opacity .18s linear;
+}
+
 /* ---------- responsive nav ---------- */
 @media (max-width:860px){
   .nav__links,.nav__pct{display:none}
@@ -840,8 +923,10 @@ a{color:inherit;text-decoration:none}
     transition-delay:0ms!important;
     scroll-behavior:auto!important;
   }
-  .field,.cursor{display:none}
-  .orb{animation:none;opacity:.22}
+  .field,.cursor,.intro{display:none!important}
+  .marquee__track{animation:none}
+  .lit .lw{opacity:1}
+  .orb > i{animation:none}
   [data-hero]{opacity:1;transform:none;filter:none;animation:none}
   .hero__shell{transform:none;opacity:1}
   [data-reveal]{opacity:0;transform:none;filter:none;transition:opacity .25s linear}

@@ -25,11 +25,20 @@
 <body>
 <a class="skip-link" href="#about">Skip to content</a>
 
+<!-- intro curtain: once per session, skippable, never shown on reduced motion -->
+<div class="intro" id="intro" aria-hidden="true">
+  <div class="intro__inner">
+    <span class="intro__name">Anuansh Tiwari</span>
+    <span class="intro__meta">AI security research &middot; Lucknow, India</span>
+    <span class="intro__bar"><i id="intro-bar"></i></span>
+  </div>
+</div>
+
 <!-- ambient layers -->
 <div class="aurora" aria-hidden="true">
-  <span class="orb orb--1" data-parallax data-speed="-0.05"></span>
-  <span class="orb orb--2" data-parallax data-speed="0.04"></span>
-  <span class="orb orb--3" data-parallax data-speed="-0.03"></span>
+  <span class="orb orb--1" data-parallax data-speed="-0.05"><i></i></span>
+  <span class="orb orb--2" data-parallax data-speed="0.04"><i></i></span>
+  <span class="orb orb--3" data-parallax data-speed="-0.03"><i></i></span>
 </div>
 <div class="field" aria-hidden="true">
   <canvas id="field-canvas"></canvas>
@@ -57,12 +66,12 @@
 
     <nav class="nav__links" id="nav-links" aria-label="Section navigation">
       <span class="nav__pill" id="nav-pill" aria-hidden="true"></span>
-      <a href="#about" data-nav="about">About</a>
-      <a href="#research" data-nav="research">Research</a>
-      <a href="#projects" data-nav="projects">Projects</a>
-      <a href="#experience" data-nav="experience">Experience</a>
-      <a href="#skills" data-nav="skills">Skills</a>
-      <a href="#contact" data-nav="contact">Contact</a>
+      <a href="#about" data-nav="about" data-decode>About</a>
+      <a href="#research" data-nav="research" data-decode>Research</a>
+      <a href="#projects" data-nav="projects" data-decode>Projects</a>
+      <a href="#experience" data-nav="experience" data-decode>Experience</a>
+      <a href="#skills" data-nav="skills" data-decode>Skills</a>
+      <a href="#contact" data-nav="contact" data-decode>Contact</a>
     </nav>
 
     <div class="nav__meta">
@@ -152,11 +161,7 @@
 
     <div class="about">
       <div class="about__prose" data-reveal-group>
-        <p data-reveal class="lede">
-          I work on the failure surface of generative AI: where safety filters give way, where agentic
-          systems inherit vulnerabilities, where synthetic media erodes the assumption that evidence is
-          evidence.
-        </p>
+        <p class="lede lit" data-split="lit">I work on the failure surface of generative AI: where safety filters give way, where agentic systems inherit vulnerabilities, where synthetic media erodes the assumption that evidence is evidence.</p>
         <p data-reveal>
           My method is first-party and reproducible. Survey claims get grounded in experiments I run
           myself &mdash; an <strong>n&nbsp;=&nbsp;880 prompt corpus</strong> probing safety-filter behaviour,
@@ -295,6 +300,15 @@
     </div>
   </div>
 </section>
+
+<!-- ═══════════ MARQUEE ═══════════ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee__track" id="marquee-track">
+    <span class="marquee__row">
+      <b>LLM-enabled cyberattacks</b><i>/</i><b>Agentic-AI security</b><i>/</i><b>Prompt-injection</b><i>/</i><b>CVE &amp; NVD analysis</b><i>/</i><b>AI resume screening</b><i>/</i><b>Post-quantum cryptography</b><i>/</i><b>ML-KEM</b><i>/</i><b>TLS 1.3</b><i>/</i><b>Offline-first tooling</b><i>/</i>
+    </span>
+  </div>
+</div>
 
 <!-- ═══════════ PROJECTS ═══════════ -->
 <section class="section" id="projects" data-section="projects">

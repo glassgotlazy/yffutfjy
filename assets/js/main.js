@@ -28,8 +28,25 @@
      letter also gets its own span carrying a running index for stagger. */
   function splitText() {
     $$('[data-split]').forEach(el => {
-      const mode  = el.dataset.split === 'chars' ? 'chars' : 'words';
+      const mode  = el.dataset.split;
       const words = el.textContent.trim().split(/\s+/);
+
+      // "lit" is not an entrance — each word just carries its index so the
+      // scroll loop can fill the paragraph in reading order with one var
+      if (mode === 'lit') {
+        el.textContent = '';
+        words.forEach((word, i) => {
+          if (i) el.appendChild(document.createTextNode(' '));
+          const w = document.createElement('span');
+          w.className = 'lw';
+          w.style.setProperty('--i', i);
+          w.textContent = word;
+          el.appendChild(w);
+        });
+        el.dataset.words = words.length;
+        return;
+      }
+
       el.textContent = '';
       el.classList.add(mode === 'chars' ? 'split--chars' : 'split--words');
 
@@ -88,11 +105,11 @@
     startCounters(el);
   }
 
-  function sweep() {
+  function sweep(y) {
     if (!pending.length) return;
-    const limit = window.innerHeight * 0.95;
+    const limit = y + window.innerHeight * 0.95;
     pending = pending.filter(el => {
-      if (el.getBoundingClientRect().top > limit) return true;
+      if (el._top === undefined || el._top > limit) return true;
       reveal(el);
       return false;
     });
@@ -171,7 +188,84 @@
     window.addEventListener('resize', pillToActive, { passive: true });
   }
 
-  /* ───────────── 5. scroll loop ───────────── */
+  /* ───────────── 5. momentum scroll ─────────────
+     Native scrolling keeps driving the page — scrollbar, keyboard, anchor
+     links and focus all behave normally — and the content simply lags
+     behind it under a transform. Touch devices keep their own native
+     momentum, which already feels better than anything re-implemented. */
+  const smooth = (() => {
+    const wrap = $('main');
+    let target = 0, current = 0, raf = 0, on = false, ro = null, last = 0;
+
+    // fraction of the remaining gap still left after one second — a
+    // frame-rate independent exponential decay, so the feel is identical
+    // at 30, 60 and 120 Hz instead of being tied to frame count
+    const DECAY = 0.0012;
+
+    function measure() {
+      if (!on || !wrap) return;
+      document.body.style.height = Math.round(wrap.scrollHeight) + 'px';
+      measureMetrics();
+      update();
+    }
+
+    function frame(now) {
+      raf = 0;
+      const dt = Math.min(now - last, 64) / 1000;   // clamp tab-switch gaps
+      last = now;
+      target = window.scrollY || window.pageYOffset;
+
+      // an anchor jump can be ten viewports away; easing the whole distance
+      // reads as sluggish, so cap how far the content ever has to travel
+      const cap = window.innerHeight * 3;
+      const gap = target - current;
+      if (Math.abs(gap) > cap) current = target - Math.sign(gap) * cap;
+
+      current = lerp(current, target, 1 - Math.pow(DECAY, dt));
+      if (Math.abs(target - current) < 0.5) current = target;
+      wrap.style.transform = `translate3d(0, ${(-current).toFixed(2)}px, 0)`;
+      update();
+      if (current !== target) raf = requestAnimationFrame(frame);
+    }
+
+    return {
+      get active() { return on; },
+      // the smoothed position, which is what is actually on screen — the
+      // scrollspy and reveals must read this, not window.scrollY
+      get y() { return on ? current : (window.scrollY || window.pageYOffset); },
+      kick() {
+        if (!on || raf) return;
+        last = performance.now();   // never carry a stale dt across an idle gap
+        raf = requestAnimationFrame(frame);
+      },
+      start() {
+        if (on || !wrap || calm || !mqFine.matches) return;
+        on = true;
+        root.classList.add('smooth');
+        current = target = window.scrollY || window.pageYOffset;
+        measure();
+        // font loading and reflow change the content height after paint
+        if ('ResizeObserver' in window) {
+          ro = new ResizeObserver(measure);
+          ro.observe(wrap);
+        }
+        window.addEventListener('resize', measure, { passive: true });
+        last = performance.now();
+        this.kick();
+      },
+      stop() {
+        if (!on) return;
+        on = false;
+        root.classList.remove('smooth');
+        document.body.style.height = '';
+        wrap.style.transform = '';
+        ro?.disconnect(); ro = null;
+        if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      }
+    };
+  })();
+
+  /* ───────────── 6. scroll loop ───────────── */
   const nav        = $('#nav');
   const navPct     = $('#nav-pct');
   const hero       = $('#hero');
@@ -179,6 +273,30 @@
   const sections   = $$('[data-section]');
   const parallaxEl = $$('[data-parallax]');
   const navIds     = new Set(navLinks.map(a => a.dataset.nav));
+
+  /* Every scroll-linked effect used to read offsetTop / scrollHeight /
+     offsetHeight per frame and then write transforms, which forces a
+     synchronous layout on every single frame. All of it is measured up
+     front instead and refreshed only when the page can actually change
+     shape (resize, reflow, webfont swap). */
+  const metrics = { max: 1, heroH: 0, sections: [], lit: [] };
+
+  function docTop(el) {
+    // rects reflect the momentum transform, so add back the position it
+    // is offset by — that equals scrollY when momentum is off
+    return el.getBoundingClientRect().top + smooth.y;
+  }
+
+  function measureMetrics() {
+    metrics.max   = Math.max(1, document.body.scrollHeight - window.innerHeight);
+    metrics.heroH = hero ? hero.offsetHeight : window.innerHeight;
+    metrics.sections = sections.map(s => ({ id: s.id, top: docTop(s) }));
+    metrics.lit = litEls.map(el => ({
+      el, top: docTop(el), h: el.offsetHeight,
+      n: Number(el.dataset.words || 0) + 3
+    }));
+    for (const el of pending) el._top = docTop(el);
+  }
 
   let ticking = false;
   let lastPct = -1;
@@ -188,6 +306,7 @@
   let activeNav = '';
 
   function onScroll() {
+    if (smooth.active) return smooth.kick();
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(update);
@@ -195,8 +314,10 @@
 
   function update() {
     ticking = false;
-    const y   = window.scrollY || window.pageYOffset;
-    const max = Math.max(1, document.body.scrollHeight - window.innerHeight);
+    // the smoothed position is what is actually on screen, so every
+    // scroll-linked effect must read it rather than window.scrollY
+    const y   = smooth.y;
+    const max = metrics.max;
     const sp  = clamp(y / max, 0, 1);
 
     velocity = lerp(velocity, Math.min(Math.abs(y - lastY), 90), 0.2);
@@ -211,7 +332,7 @@
     }
 
     // nav condenses once the hero is mostly behind us
-    const heroH = hero ? hero.offsetHeight : window.innerHeight;
+    const heroH = metrics.heroH;
     nav.classList.toggle('is-condensed', y > heroH * 0.6);
 
     // hero recedes as it leaves rather than just scrolling away
@@ -222,8 +343,8 @@
     // scrollspy — drives both the nav pill and the section rail
     const line = y + window.innerHeight * 0.35;
     let current = activeSection;
-    for (const s of sections) {
-      if (s.offsetTop <= line) current = s.id;
+    for (const s of metrics.sections) {
+      if (s.top <= line) current = s.id;
     }
     if (current !== activeSection) {
       activeSection = current;
@@ -244,11 +365,31 @@
       }
     }
 
-    sweep();
+    litPass(y);
+    sweep(y);
     field.scroll(sp, velocity);
   }
 
-  /* ───────────── 6. tilt + cursor spotlight on cards ───────────── */
+  /* paragraph that fills word by word as it crosses the viewport */
+  const litEls = $$('[data-split="lit"]');
+  function litPass(y) {
+    if (calm) return;
+    const vh = window.innerHeight;
+    for (const m of metrics.lit) {
+      const el = m.el, n = m.n;
+      const r = { top: m.top - y, bottom: m.top + m.h - y, height: m.h };
+      // resolve a value at every position, including offscreen: a jump that
+      // skips the paragraph must still leave it fully lit once passed,
+      // never stranded at the dim end
+      let p;
+      if (r.bottom < 0) p = 1;
+      else if (r.top > vh) p = 0;
+      else p = clamp((vh * 0.8 - r.top) / (vh * 0.55 + r.height * 0.5), 0, 1);
+      el.style.setProperty('--lit', (p * n).toFixed(2));
+    }
+  }
+
+  /* ───────────── 7. tilt + cursor spotlight on cards ───────────── */
   function initTilt() {
     $$('[data-tilt]').forEach(card => {
       const max = card.hasAttribute('data-tilt-soft') ? 3.5 : 7;
@@ -281,7 +422,7 @@
     });
   }
 
-  /* ───────────── 7. magnetic buttons ───────────── */
+  /* ───────────── 8. magnetic buttons ───────────── */
   function initMagnetic() {
     if (calm || mqCoarse.matches) return;
     $$('.magnetic').forEach(el => {
@@ -295,7 +436,7 @@
     });
   }
 
-  /* ───────────── 8. trailing cursor glow ─────────────
+  /* ───────────── 9. trailing cursor glow ─────────────
      A soft light that lags the pointer. The native cursor is never
      hidden, so nothing is lost if this never starts. */
   const cursor = (() => {
@@ -343,7 +484,7 @@
     };
   })();
 
-  /* ───────────── 9. copy to clipboard ───────────── */
+  /* ───────────── 10. copy to clipboard ───────────── */
   function initCopy() {
     const toast = $('#toast');
     let toastTimer = 0;
@@ -388,12 +529,12 @@
     });
   }
 
-  /* ───────────── 10. generative background field ───────────── */
+  /* ───────────── 11. generative background field ───────────── */
   const field = (() => {
     const canvas = $('#field-canvas');
     const ctx = canvas ? canvas.getContext('2d', { alpha: true }) : null;
     let w = 0, h = 0, dpr = 1, nodes = [], raf = 0, running = false;
-    let progress = 0, vel = 0, hue = 78;
+    let progress = 0, vel = 0, hue = 78, px = -1, py = -1;
 
     function size() {
       if (!canvas) return;
@@ -406,8 +547,8 @@
     }
 
     function seed() {
-      const density = mqCoarse.matches ? 22000 : 13000;
-      const count = clamp(Math.round((w * h) / density), 18, mqCoarse.matches ? 42 : 96);
+      const density = mqCoarse.matches ? 22000 : 17000;
+      const count = clamp(Math.round((w * h) / density), 18, mqCoarse.matches ? 40 : 68);
       nodes = Array.from({ length: count }, () => ({
         x: Math.random() * w,
         y: Math.random() * h,
@@ -428,9 +569,21 @@
       const link = mqCoarse.matches ? 108 : 138;
       const drift = 1 + progress * 0.6 + Math.min(vel / 45, 1.4);
 
+      const R = 160;
       for (const n of nodes) {
         n.x += n.vx * drift;
         n.y += n.vy * drift;
+        // the field parts around the pointer
+        if (px >= 0) {
+          const dx = n.x - px, dy = n.y - py;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < R * R && d2 > 1) {
+            const d = Math.sqrt(d2);
+            const f = (1 - d / R) * 1.1;
+            n.x += (dx / d) * f;
+            n.y += (dy / d) * f;
+          }
+        }
         if (n.x < -20) n.x = w + 20; else if (n.x > w + 20) n.x = -20;
         if (n.y < -20) n.y = h + 20; else if (n.y > h + 20) n.y = -20;
       }
@@ -444,6 +597,7 @@
           const d2 = dx * dx + dy * dy;
           if (d2 > link * link) continue;
           const alpha = (1 - Math.sqrt(d2) / link) * 0.2;
+          if (alpha < 0.012) continue;      // invisible, not worth a path
           ctx.strokeStyle = `hsla(${hue}, 80%, 62%, ${alpha.toFixed(3)})`;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
@@ -489,11 +643,12 @@
         });
       },
       scroll(p, v) { progress = p; vel = v; },
+      pointer(x, y) { px = x; py = y; },
       start, stop
     };
   })();
 
-  /* ───────────── 11. mobile drawer ───────────── */
+  /* ───────────── 12. mobile drawer ───────────── */
   function initDrawer() {
     const toggle = $('#nav-toggle');
     const drawer = $('#nav-drawer');
@@ -515,17 +670,117 @@
     });
   }
 
-  /* ───────────── 12. smooth scroll (fallback for older Safari) ───────────── */
-  function initSmoothScroll() {
-    if ('scrollBehavior' in document.documentElement.style) return;
+  /* ───────────── 13. in-page anchors ─────────────
+     Under momentum scroll <main> is position:fixed, so its sections no
+     longer move with the page and the browser's own hash scrolling lands
+     nowhere. Every in-page link is therefore resolved here instead, from
+     layout offsets that are correct in both modes. */
+  function anchorTop(id) {
+    if (!id) return 0;
+    const hit = metrics.sections.find(s => s.id === id);
+    const el = document.getElementById(id);
+    if (!hit && !el) return 0;
+    const pad = (nav?.offsetHeight || 66) + 18;
+    return Math.max(0, (hit ? hit.top : docTop(el)) - pad);
+  }
+
+  function goTo(id, push) {
+    const top = anchorTop(id);
+    // with momentum on, the lerp supplies the easing; without it, let the
+    // browser ease natively
+    const behavior = (smooth.active || calm || !('scrollBehavior' in root.style)) ? 'auto' : 'smooth';
+    window.scrollTo({ top, behavior });
+    if (push && id) history.replaceState(null, '', '#' + id);
+  }
+
+  function initAnchors() {
     $$('a[href^="#"]').forEach(a => {
       a.addEventListener('click', (e) => {
-        const target = document.getElementById(a.getAttribute('href').slice(1));
-        if (!target) return;
+        const id = a.getAttribute('href').slice(1);
+        if (!id || id === 'top') { e.preventDefault(); return goTo(null, false); }
+        if (!document.getElementById(id)) return;
         e.preventDefault();
-        window.scrollTo({ top: target.offsetTop - 90, behavior: calm ? 'auto' : 'smooth' });
+        goTo(id, true);
       });
     });
+  }
+
+  /* ───────────── 14. intro curtain ─────────────
+     Shown once per session, dismissible, and never on reduced motion —
+     a recruiter reloading the page should not sit through it twice. */
+  const intro = (() => {
+    const el = $('#intro');
+    const bar = $('#intro-bar');
+    let done = false;
+
+    function finish() {
+      if (done) return;
+      done = true;
+      el.classList.add('is-out');
+      root.classList.remove('is-intro');
+      try { sessionStorage.setItem('at-intro-seen', '1'); } catch { /* private mode */ }
+      setTimeout(() => el.remove(), 1100);
+      stageHero();
+    }
+
+    return {
+      run() {
+        let seen = false;
+        try { seen = sessionStorage.getItem('at-intro-seen') === '1'; } catch { /* private mode */ }
+        if (!el || calm || seen) { el?.remove(); stageHero(); return; }
+
+        root.classList.add('is-intro');
+        el.classList.add('is-live');
+        bar?.animate(
+          [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
+          { duration: 820, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }
+        );
+
+        const timer = setTimeout(finish, 1000);
+        const skip = () => { clearTimeout(timer); finish(); };
+        el.addEventListener('click', skip);
+        window.addEventListener('keydown', skip, { once: true });
+        window.addEventListener('wheel', skip, { once: true, passive: true });
+        window.addEventListener('touchstart', skip, { once: true, passive: true });
+      }
+    };
+  })();
+
+  /* ───────────── 15. decode-on-hover ───────────── */
+  const GLYPHS = '#$%&/<>[]{}=+*~01';
+  function initDecode() {
+    if (calm || mqCoarse.matches) return;
+    $$('[data-decode]').forEach(el => {
+      const text = el.textContent;
+      el.addEventListener('pointerenter', () => {
+        if (el.dataset.busy) return;
+        el.dataset.busy = '1';
+        const dur = 360, t0 = performance.now();
+        const tick = (now) => {
+          const p = clamp((now - t0) / dur, 0, 1);
+          const settled = Math.round(p * text.length);
+          let out = '';
+          for (let i = 0; i < text.length; i++) {
+            out += (i < settled || text[i] === ' ')
+              ? text[i]
+              : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          }
+          el.textContent = out;
+          if (p < 1) return requestAnimationFrame(tick);
+          el.textContent = text;          // always restore the real label
+          delete el.dataset.busy;
+        };
+        requestAnimationFrame(tick);
+      });
+    });
+  }
+
+  /* ───────────── 16. marquee ─────────────
+     The track is duplicated so a -50% translate loops seamlessly. */
+  function initMarquee() {
+    const track = $('#marquee-track');
+    const row = track ? $('.marquee__row', track) : null;
+    if (row) track.appendChild(row.cloneNode(true));
   }
 
   /* ───────────── boot ───────────── */
@@ -537,13 +792,37 @@
     initPill();
     initDrawer();
     initCopy();
-    initSmoothScroll();
+    initDecode();
+    initMarquee();
+    initAnchors();
     field.init();
     cursor.init();
-    stageHero();
+    intro.run();
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });
+
+    // the field parts around the pointer
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      field.pointer(e.clientX, e.clientY);
+    }, { passive: true });
+    window.addEventListener('pointerleave', () => field.pointer(-1, -1), { passive: true });
+
+    smooth.start();
+    measureMetrics();
+
+    const remeasure = () => { measureMetrics(); onScroll(); };
+    window.addEventListener('resize', remeasure, { passive: true });
+    if ('ResizeObserver' in window) new ResizeObserver(remeasure).observe($('main'));
+    // webfonts swap in after first paint and move everything
+    document.fonts?.ready.then(remeasure).catch(() => {});
+
+    // a deep link arrives before the wrapper is fixed, so re-resolve it
+    if (location.hash.length > 1) {
+      const id = location.hash.slice(1);
+      if (document.getElementById(id)) requestAnimationFrame(() => goTo(id, false));
+    }
     update();
 
     // react live if the user flips the OS motion setting
@@ -552,6 +831,8 @@
       if (calm) {
         field.stop();
         cursor.stop();
+        smooth.stop();
+        litEls.forEach(el => el.style.removeProperty('--lit'));
         hero?.style.removeProperty('--hp');
         parallaxEl.forEach(el => { el.style.transform = ''; });
         $$('[data-tilt]').forEach(el => { el.style.transform = ''; });
@@ -560,6 +841,7 @@
       } else {
         field.start();
         cursor.init();
+        smooth.start();
       }
     };
     mqMotion.addEventListener

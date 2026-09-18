@@ -19,22 +19,50 @@ assets/js/main.js     the motion layer
 
 Two engines drive everything, so nothing competes for frames:
 
-- **One `requestAnimationFrame` scroll loop** — progress bar, nav condense, nav pill,
-  section rail, parallax, hero exit, background hue and field velocity all read from a
-  single pass.
+- **One `requestAnimationFrame` scroll loop** — momentum scroll, progress bar, nav
+  condense, nav pill, section rail, parallax, hero exit, scroll-lit type, background hue
+  and field velocity all read from a single pass.
 - **One `IntersectionObserver`** — section reveals, staggered children, counters. A
   per-frame sweep backs it up so nothing stays hidden after a jump the observer never
   sees: an anchor link, End/Home, a scrollbar drag, or a reload part-way down.
 
+Nothing on the per-frame path reads layout. `offsetTop`, `scrollHeight` and
+`offsetHeight` are measured once into a cache and refreshed only when the page can
+change shape — resize, reflow, webfont swap. Reading them per frame while also writing
+transforms forces a synchronous layout on every frame.
+
 What's on the page:
 
+- **Momentum scroll** — native scrolling still drives everything (scrollbar, keyboard,
+  focus, anchors); `<main>` just lags behind it under a transform. The easing is an
+  exponential decay normalised by frame time, so it feels identical at 30, 60 and 120 Hz,
+  and the catch-up distance is capped at three viewports so a long anchor jump never
+  crawls. Off on touch, which already has better native momentum, and off on reduced
+  motion. Because a fixed wrapper breaks the browser's own hash scrolling, every in-page
+  link is resolved from cached layout offsets instead.
+- **Intro curtain** — once per session, dismissible by click, key, wheel or touch, and
+  never shown on reduced motion. It is `display:none` by default, so a page with no JS
+  never gets a curtain it has no way to dismiss.
+- **Scroll-lit paragraph** — the About lede fills word by word in reading order. One
+  variable (a running word count) drives it; each word resolves its own opacity from its
+  index, so no DOM is touched per frame.
+- **Marquee** — a band of real research topics; the track is duplicated so the loop is
+  seamless, and it pauses on hover.
+- **Decode on hover** — nav labels scramble and resolve, and always restore their real
+  text.
 - **Scroll progress** — `--sp` (0→1) is written to `:root` once per frame; the progress
   bar, the nav percentage readout and the background gradient all read from it.
 - **Background** — a fixed gradient whose hue and focal points track `--sp` (lime at the
   top → violet at the bottom), three slow-drifting parallaxed aurora orbs, and a canvas
-  node field whose colour tracks `--sp` and whose drift speeds up with scroll velocity.
-  Particle count scales with viewport area, drops on coarse-pointer devices, and the loop
-  stops when the tab is hidden.
+  node field whose colour tracks `--sp`, whose drift speeds up with scroll velocity, and
+  which parts around the pointer. Particle count scales with viewport area, drops on
+  coarse-pointer devices, and the loop stops when the tab is hidden.
+
+  The orbs get their softness from multi-stop radial gradients, not `filter: blur()`. A
+  90px blur on elements that size cost around 40fps by itself. Each orb is also split in
+  two: the outer element carries the scroll parallax, the inner one the drift keyframes,
+  because a CSS animation on `transform` outranks an inline style and would otherwise
+  silently discard the parallax.
 - **Split text** — headings split into words (mask wipe from below) or characters (rise,
   unblur, settle out of depth). The hero name then takes one light sweep across its
   letters. Real spaces are preserved between word spans, so headings still copy and read
@@ -62,10 +90,16 @@ counters render their final value immediately, and smooth scrolling is off. The 
 glow stays — it is light, not movement. The preference is watched at runtime, so flipping
 it mid-session takes effect without a reload.
 
-Verified in Chromium at 1440×900 and 390×844, and with `reducedMotion: reduce`: no console
-errors, no horizontal overflow, all 58 reveal targets resolve, all 56 staggered chips land
-at full opacity, every heading renders legibly, counters land on their exact values, and
-the copy buttons work in all three modes.
+Verified in Chromium at 1440×900, at 390×844 with touch, and with `reducedMotion: reduce`:
+no console errors, no horizontal overflow, all 57 reveal targets resolve, every heading
+renders legibly, counters land on their exact values, the copy buttons work, the intro
+clears, the footer is reachable at maximum scroll, nav and rail anchors land on target,
+the scroll-lit paragraph fills, and the decode effect restores its labels — in all three
+modes.
+
+Frame rate is measured under software rasterisation (no GPU), so real hardware is better:
+~49fps while scrolling on desktop, ~59fps on a 4×-throttled mobile profile. `perf.js` and
+`bisect.js` in the verification scripts measure this and attribute cost per layer.
 
 ## Outstanding TODOs
 
