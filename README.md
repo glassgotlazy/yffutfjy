@@ -126,9 +126,16 @@ these are fabricated — fill them in as they exist:
 - DOI / proceedings links for each paper
 - Live demo URLs for the Offline PDF Toolkit and GlucoLog Pro
 - Repo link and live demo URL for the Amity Admissions Assistant
-- CV / résumé PDF link in the contact section
 - `og:url` and `og:image` in `<head>`, once the site is deployed
-- An audio file at `assets/audio/ambient.mp3` (see that folder's README)
+
+## Known inconsistency to resolve
+
+The résumé in `assets/docs/` describes the Offline PDF Toolkit as **Python, Streamlit,
+PyMuPDF, pypdf, pikepdf** — a suite that runs locally on the machine. The site describes it
+as running client-side in the browser, which is what the supplied screenshot states in its
+own header ("runs 100% in your browser. No uploads, no API, no server."), and what the
+brief said. Both documents are public and a reader may well see both. One of them needs
+correcting; the site currently follows the screenshot.
 
 ## Project images
 

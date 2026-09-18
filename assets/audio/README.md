@@ -1,5 +1,15 @@
 # Ambient audio
 
+**Current track:** `ambient.mp3` — "Day One Three", supplied by the author as
+cleared for use. It is re-encoded for the web: mono, 64kbps, 3:26, 1.6MB (down
+from 2.8MB stereo at 109kbps). The original upload is preserved in git history
+at commit `ad50548` if you ever want it back. The title is shown in the player
+and is set by `TRACK` in the `sound` module.
+
+If the licence behind this track requires attribution, add the credit to the
+contact section — nothing in the page does that automatically.
+
+
 Drop your track here as `ambient.mp3` (and optionally `ambient.ogg` /
 `ambient.wav` — the page lists all three as `<source>` and the browser picks
 whichever it can play).

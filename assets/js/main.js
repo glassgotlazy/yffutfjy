@@ -1056,6 +1056,7 @@ void main(){
     const el   = $('#track');
     const pill = $('#sound');
     const KEY  = 'at-sound';
+    const TRACK = 'Day One Three';   // shown in the pill while playing
 
     const VOLUME      = 0.32;    // ceiling — never full blast
     const START_MUTED = false;   // true = silent until the visitor asks
@@ -1066,7 +1067,7 @@ void main(){
     function label() {
       if (!pill) return;
       const l = $('.pill__label', pill);
-      if (l) l.textContent = playing ? 'Sound on' : 'Sound off';
+      if (l) l.textContent = playing ? TRACK : 'Sound off';
       pill.setAttribute('aria-pressed', String(playing));
       pill.setAttribute('aria-label', playing ? 'Mute ambient sound' : 'Play ambient sound');
       pill.classList.toggle('is-playing', playing);
