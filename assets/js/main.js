@@ -102,6 +102,10 @@
   function reveal(el) {
     el.classList.add('is-in');
     el.querySelector('.split')?.classList.add('is-in');
+    if (el.hasAttribute('data-decode-on-reveal')) {
+      const lbl = el.querySelector('.lbl');
+      if (lbl) setTimeout(() => scramble(lbl, 420), 120);
+    }
     startCounters(el);
   }
 
@@ -967,74 +971,147 @@ void main(){
     });
   }
 
-  /* ───────────── 14. intro curtain ─────────────
-     Shown once per session, dismissible, and never on reduced motion —
-     a recruiter reloading the page should not sit through it twice. */
-  const intro = (() => {
-    const el = $('#intro');
-    const bar = $('#intro-bar');
-    let done = false;
+  /* ───────────── 14. enter gate ─────────────
+     Replaces the old auto-dismissing curtain. It is the brand moment AND
+     the user gesture browsers require before audio may start, so it earns
+     the click it costs. Shown once per session; a reload goes straight in.
+     The progress bar tracks real readiness (webfonts, window load), floored
+     so it never flashes past and ceilinged so it can never hang. */
+  const gate = (() => {
+    const el    = $('#gate');
+    const btn   = $('#gate-enter');
+    const bar   = $('#gate-bar');
+    const pct   = $('#gate-pct');
+    const label = $('#gate-label');
+    const hint  = $('#gate-hint');
 
-    function finish() {
-      if (done) return;
+    const MIN_MS = 900;    // never blink past, even from cache
+    const MAX_MS = 4000;   // never hold the visitor hostage
+    let done = false, shown = 0, target = 0.08, raf = 0, armed = false;
+
+    function paint(p) {
+      bar.style.transform = 'scaleX(' + p.toFixed(3) + ')';
+      pct.textContent = String(Math.round(p * 100)).padStart(2, '0');
+    }
+
+    function arm() {
+      if (armed) return;
+      armed = true;
+      btn.disabled = false;
+      label.textContent = 'Click to enter';
+      try { btn.focus({ preventScroll: true }); } catch { btn.focus(); }
+    }
+
+    function enter() {
+      if (done || !armed) return;
       done = true;
       el.classList.add('is-out');
-      root.classList.remove('is-intro');
-      try { sessionStorage.setItem('at-intro-seen', '1'); } catch { /* private mode */ }
-      setTimeout(() => el.remove(), 1100);
+      root.classList.remove('is-gate');
+      try { sessionStorage.setItem('at-gate-seen', '1'); } catch { /* private mode */ }
+      setTimeout(function () { el.remove(); }, 1250);
       stageHero();
     }
 
     return {
       run() {
         let seen = false;
-        try { seen = sessionStorage.getItem('at-intro-seen') === '1'; } catch { /* private mode */ }
-        if (!el || calm || seen) { el?.remove(); stageHero(); return; }
+        try { seen = sessionStorage.getItem('at-gate-seen') === '1'; } catch { /* private mode */ }
+        if (!el || seen) { el?.remove(); stageHero(); return; }
 
-        root.classList.add('is-intro');
+        root.classList.add('is-gate');
+        el.hidden = false;
         el.classList.add('is-live');
-        bar?.animate(
-          [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }],
-          { duration: 820, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }
-        );
+        $('.gate .split')?.classList.add('is-in');
 
-        const timer = setTimeout(finish, 1000);
-        const skip = () => { clearTimeout(timer); finish(); };
-        el.addEventListener('click', skip);
-        window.addEventListener('keydown', skip, { once: true });
-        window.addEventListener('wheel', skip, { once: true, passive: true });
-        window.addEventListener('touchstart', skip, { once: true, passive: true });
+        // only promise sound if it is actually going to play
+        try {
+          if (localStorage.getItem('at-sound') === 'off') hint.textContent = 'Click anywhere or press Enter';
+          else hint.textContent = 'Sound on \u00b7 click anywhere or press Enter';
+        } catch { /* private mode */ }
+
+        var bump = function (v) { target = Math.max(target, v); };
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(function () { bump(0.55); }).catch(function () { bump(0.55); });
+        } else { bump(0.55); }
+        if (document.readyState === 'complete') bump(0.94);
+        else window.addEventListener('load', function () { bump(0.94); }, { once: true });
+
+        var t0 = performance.now();
+        var tick = function (now) {
+          var elapsed = now - t0;
+          if (elapsed > MAX_MS) target = 1;
+          if (target >= 0.94 && elapsed > MIN_MS) target = 1;
+          shown += (target - shown) * 0.09;
+          if (target === 1 && shown > 0.985) shown = 1;
+          paint(shown);
+          if (shown < 1) { raf = requestAnimationFrame(tick); return; }
+          raf = 0;
+          arm();
+        };
+        raf = requestAnimationFrame(tick);
+
+        btn.addEventListener('click', function (e) { e.stopPropagation(); enter(); });
+        el.addEventListener('click', enter);
+        window.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); enter(); }
+        });
       }
     };
   })();
 
-  /* ───────────── 15. decode-on-hover ───────────── */
+  /* ───────────── 15. decode ─────────────
+     Shared by hover on the nav and by section labels as they reveal. */
   const GLYPHS = '#$%&/<>[]{}=+*~01';
+
+  function scramble(el, dur) {
+    if (calm || !el) return;
+    const text = el.dataset.text || el.textContent;
+    el.dataset.text = text;
+    if (el.dataset.busy) return;
+    el.dataset.busy = '1';
+    const t0 = performance.now();
+    const ms = dur || 360;
+    const tick = (now) => {
+      const p = clamp((now - t0) / ms, 0, 1);
+      const settled = Math.round(p * text.length);
+      let out = '';
+      for (let i = 0; i < text.length; i++) {
+        out += (i < settled || text[i] === ' ')
+          ? text[i]
+          : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+      }
+      el.textContent = out;
+      if (p < 1) return requestAnimationFrame(tick);
+      el.textContent = text;          // always restore the real label
+      delete el.dataset.busy;
+    };
+    requestAnimationFrame(tick);
+  }
+
   function initDecode() {
     if (calm || mqCoarse.matches) return;
     $$('[data-decode]').forEach(el => {
-      const text = el.textContent;
-      el.addEventListener('pointerenter', () => {
-        if (el.dataset.busy) return;
-        el.dataset.busy = '1';
-        const dur = 360, t0 = performance.now();
-        const tick = (now) => {
-          const p = clamp((now - t0) / dur, 0, 1);
-          const settled = Math.round(p * text.length);
-          let out = '';
-          for (let i = 0; i < text.length; i++) {
-            out += (i < settled || text[i] === ' ')
-              ? text[i]
-              : GLYPHS[(Math.random() * GLYPHS.length) | 0];
-          }
-          el.textContent = out;
-          if (p < 1) return requestAnimationFrame(tick);
-          el.textContent = text;          // always restore the real label
-          delete el.dataset.busy;
-        };
-        requestAnimationFrame(tick);
-      });
+      el.addEventListener('pointerenter', () => scramble(el));
     });
+  }
+
+  /* ───────────── 15b. hero follows the pointer ───────────── */
+  function initHeroParallax() {
+    if (calm || mqCoarse.matches) return;
+    const el = $('[data-hero-parallax]');
+    if (!el) return;
+    let raf = 0, px = 0, py = 0;
+    window.addEventListener('pointermove', (e) => {
+      if (e.pointerType && e.pointerType !== 'mouse') return;
+      px = (e.clientX / window.innerWidth - 0.5) * 16;
+      py = (e.clientY / window.innerHeight - 0.5) * 11;
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        el.style.setProperty('--px', px.toFixed(2) + 'px');
+        el.style.setProperty('--py', py.toFixed(2) + 'px');
+      });
+    }, { passive: true });
   }
 
   /* ───────────── 16. marquee ─────────────
@@ -1165,11 +1242,12 @@ void main(){
     initCopy();
     sound.init();
     initDecode();
+    initHeroParallax();
     initMarquee();
     initAnchors();
     bg.init();
     cursor.init();
-    intro.run();
+    gate.run();
 
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll, { passive: true });

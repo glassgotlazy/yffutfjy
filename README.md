@@ -40,9 +40,19 @@ What's on the page:
   crawls. Off on touch, which already has better native momentum, and off on reduced
   motion. Because a fixed wrapper breaks the browser's own hash scrolling, every in-page
   link is resolved from cached layout offsets instead.
-- **Intro curtain** — once per session, dismissible by click, key, wheel or touch, and
-  never shown on reduced motion. It is `display:none` by default, so a page with no JS
-  never gets a curtain it has no way to dismiss.
+- **Enter gate** — a click-to-enter screen before the page. It replaced the old
+  auto-dismissing curtain rather than stacking on top of it, and it earns the click it
+  costs: browsers refuse to start audio without a user gesture, and this is that gesture.
+  The progress bar tracks real readiness (webfonts, window load), floored at 900ms so it
+  never blinks past and ceilinged at 4s so it can never hang. Operable by click anywhere,
+  Enter or Space; focus moves to the button when it arms; shown once per session so a
+  reload goes straight in. It is `display:none` by default, so a page with no JS is never
+  trapped behind a gate it cannot dismiss. On reduced motion it still appears — it is the
+  audio gesture — but nothing animates and the exit is instant.
+- **Hero pointer drift** — the hero shifts slightly with the pointer. The scroll-exit
+  (`--hp`) and the drift (`--px`/`--py`) compose in one transform so neither clobbers the
+  other.
+- **Section labels decode** as they reveal, sharing the scramble used by nav hover.
 - **Scroll-lit paragraph** — the About lede fills word by word in reading order. One
   variable (a running word count) drives it; each word resolves its own opacity from its
   index, so no DOM is touched per frame.

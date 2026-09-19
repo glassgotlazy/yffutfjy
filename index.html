@@ -25,12 +25,31 @@
 <body>
 <a class="skip-link" href="#about">Skip to content</a>
 
-<!-- intro curtain: once per session, skippable, never shown on reduced motion -->
-<div class="intro" id="intro" aria-hidden="true">
-  <div class="intro__inner">
-    <span class="intro__name">Anuansh Tiwari</span>
-    <span class="intro__meta">AI security research &middot; Lucknow, India</span>
-    <span class="intro__bar"><i id="intro-bar"></i></span>
+<!-- Enter gate. Replaces the old auto-dismissing curtain: it does the same
+     brand moment AND supplies the user gesture browsers require before audio
+     may start. Once per session, keyboard-operable, instant on reduced motion. -->
+<div class="gate" id="gate" hidden>
+  <span class="gate__panel gate__panel--t" aria-hidden="true"></span>
+  <span class="gate__panel gate__panel--b" aria-hidden="true"></span>
+
+  <div class="gate__inner">
+    <p class="gate__mark">Anuansh Tiwari<sup>&reg;</sup></p>
+
+    <h2 class="gate__name"><span class="split" data-split="chars">Anuansh Tiwari</span></h2>
+    <p class="gate__meta">AI security research &middot; Lucknow, India</p>
+
+    <button class="gate__enter" id="gate-enter" type="button" disabled
+            aria-label="Enter the site">
+      <span class="gate__ring" aria-hidden="true"></span>
+      <span class="gate__label" id="gate-label">Loading</span>
+    </button>
+
+    <p class="gate__load" aria-hidden="true">
+      <span class="gate__bar"><i id="gate-bar"></i></span>
+      <span class="gate__pct" id="gate-pct">00</span>
+    </p>
+
+    <p class="gate__hint" id="gate-hint">Click anywhere or press Enter</p>
   </div>
 </div>
 
@@ -115,7 +134,7 @@
   <span class="edge edge--l" aria-hidden="true">AI SECURITY RESEARCH</span>
   <span class="edge edge--r" aria-hidden="true">LUCKNOW, INDIA</span>
 
-  <div class="shell hero__shell" id="hero-shell">
+  <div class="shell hero__shell" id="hero-shell" data-hero-parallax>
     <div class="hero__grid-l">
       <h1 class="hero__title" data-hero="2">
         <span class="split" data-split="chars">Anuansh Tiwari</span>
@@ -162,7 +181,7 @@
 <section class="section" id="about" data-section="about">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>ABOUT<b>01</b></span>
+      <span class="sec-head__idx" data-reveal="left" data-decode-on-reveal><i class="bul"></i><span class="lbl">ABOUT</span><b>01</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Measurement first</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Claims are cheap. I build the corpus, run the experiment, and publish the numbers.</p>
@@ -229,7 +248,7 @@
 <section class="section" id="research" data-section="research">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>RESEARCH<b>02</b></span>
+      <span class="sec-head__idx" data-reveal="left" data-decode-on-reveal><i class="bul"></i><span class="lbl">RESEARCH</span><b>02</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Research &amp; publications</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Surveys, reviews and measurements on how generative systems fail.</p>
@@ -311,7 +330,7 @@
 <section class="section" id="projects" data-section="projects">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>PROJECTS<b>03</b></span>
+      <span class="sec-head__idx" data-reveal="left" data-decode-on-reveal><i class="bul"></i><span class="lbl">PROJECTS</span><b>03</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Projects</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Offline-first tools where privacy is architectural, not a promise.</p>
@@ -391,7 +410,7 @@
 <section class="section" id="experience" data-section="experience">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>EXPERIENCE<b>04</b></span>
+      <span class="sec-head__idx" data-reveal="left" data-decode-on-reveal><i class="bul"></i><span class="lbl">EXPERIENCE</span><b>04</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Experience</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Telecom security, research and field programmes.</p>
@@ -453,7 +472,7 @@
 <section class="section" id="skills" data-section="skills">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>SKILLS<b>05</b></span>
+      <span class="sec-head__idx" data-reveal="left" data-decode-on-reveal><i class="bul"></i><span class="lbl">SKILLS</span><b>05</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Skills</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Languages, data tooling, model APIs and the security work they serve.</p>
@@ -504,7 +523,7 @@
 <section class="section" id="leadership" data-section="leadership">
   <div class="shell">
     <header class="sec-head" data-reveal-group>
-      <span class="sec-head__idx" data-reveal="left"><i class="bul"></i>LEADERSHIP<b>06</b></span>
+      <span class="sec-head__idx" data-reveal="left" data-decode-on-reveal><i class="bul"></i><span class="lbl">LEADERSHIP</span><b>06</b></span>
       <h2 class="sec-head__title" data-reveal="title"><span class="split" data-split="words">Leadership</span></h2>
       <span class="sec-head__rule" data-reveal="rule" aria-hidden="true"></span>
       <p class="sec-head__sub" data-reveal>Professional community and chapter building.</p>
@@ -534,7 +553,7 @@
 <section class="section section--contact" id="contact" data-section="contact">
   <div class="shell">
     <div class="cta" data-reveal-group>
-      <p class="cta__eyebrow" data-reveal><i class="bul"></i>CONTACT<b>07</b></p>
+      <p class="cta__eyebrow" data-reveal data-decode-on-reveal><i class="bul"></i><span class="lbl">CONTACT</span><b>07</b></p>
       <h2 class="cta__title" data-reveal="title">
         <span class="split" data-split="chars">Let&rsquo;s compare notes.</span>
       </h2>
