@@ -1,0 +1,29 @@
+I research how generative AI breaks — and build tools that don't.
+
+n = 880 prompt corpus. 75 sources → 51 coded studies. 53 PDF tools that never
+leave your browser.
+
+portfolio-tau-nine-4wkwkxlnn5.vercel.app
+
+---
+Alt (shorter, for X/Bluesky):
+
+I research how generative AI breaks — and build tools that don't.
+n=880 prompt corpus · 51 coded studies · 53 client-side PDF tools
+portfolio-tau-nine-4wkwkxlnn5.vercel.app
+
+---
+Alt (LinkedIn, first line is the hook):
+
+"Claims are cheap. I build the corpus, run the experiment, and publish the numbers."
+
+New portfolio is up. Every claim on it is backed by a number: a first-party
+n=880 prompt corpus behind the LLM-attack survey, 75 sources narrowed to 51
+coded studies in the resume-screening review, and 53 PDF tools that run
+entirely client-side — no server to send your documents to.
+
+portfolio-tau-nine-4wkwkxlnn5.vercel.app
+
+---
+Accessibility note for the post: the video carries no spoken narration, and all
+on-screen copy is reproduced above.

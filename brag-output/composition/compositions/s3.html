@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <template>
+      <div id="s3-root" class="scene" data-composition-id="s3" data-width="1920" data-height="1080" data-duration="3.8">
+        <div id="card3" class="stack">
+          <span class="kicker">Presented &middot; ICETA 2026</span>
+          <span id="rule3" class="rule"></span>
+          <span class="headline">Weaponizing Generative AI</span>
+          <span id="fig880" class="figure">n = 0</span>
+          <span id="cap3" class="caption">prompt corpus. Run first-party.</span>
+        </div>
+        <script>
+          var tl = gsap.timeline({ paused: true });
+      tl.fromTo("#card3", { y: 46, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.0);
+      tl.fromTo("#rule3", { scaleX: 0 },         { scaleX: 1, duration: 0.45, ease: "power2.out" }, 0.25);
+      var n880 = { v: 0 };
+      var fig880 = document.getElementById("fig880");
+      tl.to(n880, {
+        v: 880, duration: 0.6, ease: "power2.out",
+        onUpdate: function () { fig880.textContent = "n = " + Math.round(n880.v); }
+      }, 0.4);
+      tl.fromTo("#cap3", { opacity: 0 }, { opacity: 1, duration: 0.35 }, 1.0);
+          window.__timelines["s3"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

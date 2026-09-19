@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <template>
+      <div id="s6-root" class="scene" data-composition-id="s6" data-width="1920" data-height="1080" data-duration="3.4">
+        <div class="stack">
+          <span id="outro" class="outro">Measurement first.</span>
+          <span id="contact" class="contact">anuanshtiwari191@gmail.com &middot; github.com/glassgotlazy</span>
+        </div>
+        <script>
+          var tl = gsap.timeline({ paused: true });
+      tl.fromTo("#outro",   { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.45, ease: "power3.out" }, 0.0);
+      tl.fromTo("#contact", { opacity: 0 },        { opacity: 1, duration: 0.5 }, 1.6);
+          window.__timelines["s6"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

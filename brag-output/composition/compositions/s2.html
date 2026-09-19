@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <template>
+      <div id="s2-root" class="scene" data-composition-id="s2" data-width="1920" data-height="1080" data-duration="2.95">
+        <div class="stack">
+          <span id="name" class="name">Anuansh Tiwari</span>
+          <span id="eyebrow" class="eyebrow">AI security research &middot; Lucknow, India</span>
+        </div>
+        <script>
+          var tl = gsap.timeline({ paused: true });
+      // beat-locked: 2.65s global (strong cue) — scene-local 0
+      tl.fromTo("#name",    { scale: 1.06, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.25, ease: "power2.out" }, 0.0);
+      tl.fromTo("#eyebrow", { opacity: 0, y: 12 },       { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.3);
+          window.__timelines["s2"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

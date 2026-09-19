@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <template>
+      <div id="s5-root" class="scene" data-composition-id="s5" data-width="1920" data-height="1080" data-duration="4.4">
+        <div class="split">
+          <span id="shotwrap" class="shot">
+            <img id="shot-a" src="assets/img/pdf-toolkit.webp" alt="Offline PDF Toolkit interface" />
+            <img id="shot-b" src="assets/img/glucolog.webp" alt="GlucoLog Pro dashboard" />
+          </span>
+          <span class="side">
+            <span class="kicker">Shipped</span>
+            <span id="prodline" class="prodline">Offline PDF Toolkit &mdash; <em>53 tools, client-side</em></span>
+            <span id="closer" class="closer">No server to send it to.</span>
+          </span>
+        </div>
+        <script>
+          var tl = gsap.timeline({ paused: true });
+      tl.fromTo("#shotwrap", { scale: 1.05, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.55, ease: "power3.out" }, 0.0);
+      tl.fromTo("#prodline", { opacity: 0, y: 18 },       { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 0.35);
+      // beat-locked: 15.28s global — product cross-cut
+      tl.to("#shot-a", { opacity: 0, duration: 0.3, ease: "power1.inOut" }, 2.08);
+      tl.to("#shot-b", { opacity: 1, duration: 0.3, ease: "power1.inOut" }, 2.08);
+      tl.fromTo("#closer", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.40);
+          window.__timelines["s5"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

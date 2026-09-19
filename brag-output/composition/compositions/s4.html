@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <template>
+      <div id="s4-root" class="scene" data-composition-id="s4" data-width="1920" data-height="1080" data-duration="3.8">
+        <div class="stack">
+          <span class="kicker">AI resume screening &mdash; critical review</span>
+          <div class="pair">
+            <span id="fig75" class="figure">75</span>
+            <span class="arrowwrap"><span id="shaft" class="shaft"></span><span id="head" class="head"></span></span>
+            <span id="fig51" class="figure">51</span>
+          </div>
+          <span id="sub4" class="sub">sources screened &rarr; studies coded &middot; PRISMA-informed</span>
+        </div>
+        <script>
+          var tl = gsap.timeline({ paused: true });
+      // beat-grid: 75 at 9.50s, arrow at 10.01s, 51 at 10.54s (global)
+      tl.fromTo("#fig75", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.34, ease: "power3.out" }, 0.10);
+      tl.fromTo("#shaft", { scaleX: 0 },         { scaleX: 1, duration: 0.30, ease: "power2.inOut" }, 0.61);
+      tl.fromTo("#head",  { opacity: 0 },        { opacity: 1, duration: 0.20 }, 0.82);
+      tl.fromTo("#fig51", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.34, ease: "power3.out" }, 1.14);
+      tl.fromTo("#sub4",  { opacity: 0 },        { opacity: 1, duration: 0.35 }, 1.50);
+          window.__timelines["s4"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>

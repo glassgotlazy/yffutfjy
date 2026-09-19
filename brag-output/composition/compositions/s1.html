@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+  <body>
+    <template>
+      <div id="s1-root" class="scene" data-composition-id="s1" data-width="1920" data-height="1080" data-duration="2.65">
+        <div class="stack">
+          <span id="hook1" class="hook">I research how generative AI breaks</span>
+          <span class="wipe" data-layout-allow-overflow><span id="hook2" class="hook hook--2">&mdash; and build tools that don&rsquo;t.</span></span>
+        </div>
+        <script>
+          var tl = gsap.timeline({ paused: true });
+      /* the plan cued this at 1.5s; a five-word line needs ~1.5s settled, so
+         readability takes the cue's place */
+      tl.fromTo("#hook1", { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.0);
+      tl.fromTo("#hook2", { yPercent: 110 }, { yPercent: 0, duration: 0.52, ease: "power3.out" }, 1.15);
+          window.__timelines["s1"] = tl;
+        </script>
+      </div>
+    </template>
+  </body>
+</html>
